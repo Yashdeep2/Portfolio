@@ -28,8 +28,8 @@ const portfolioData = {
         description: "Enterprise-grade dashboard tracking KPIs across multiple business units with advanced DAX calculations, dynamic filtering, and real-time data integration.",
         technologies: ["Power BI", "DAX", "Power Query", "SQL Server"],
         images: [
-          "https://github.com/Yashdeep2/Portfolio/Screenshot 2025-09-11 163408.png",
-          "https://github.com/Yashdeep2/Portfolio/Screenshot 2025-09-11 163442.png"
+          "Screenshot 2025-09-11 163408.png",
+          "Screenshot 2025-09-11 163442.png"
         ],
         features: ["Real-time data updates", "Interactive drill-through", "Mobile optimization", "Automated reporting"],
         impact: "Improved decision-making efficiency by 40%"
@@ -39,8 +39,8 @@ const portfolioData = {
         description: "Comprehensive financial dashboard with predictive analytics, variance analysis, and strategic KPI monitoring for executive leadership.",
         technologies: ["Power BI", "SQL", "Azure", "Python"],
         images: [
-          "https://github.com/Yashdeep2/Portfolio/Screenshot 2025-09-11 163442.png",
-          "https://github.com/Yashdeep2/Portfolio/Screenshot 2025-09-11 163408.png"
+          "Screenshot 2025-09-11 163442.png",
+          "Screenshot 2025-09-11 163408.png"
         ],
         features: ["Predictive modeling", "Automated reporting", "Executive summaries", "Trend analysis"],
         impact: "Reduced reporting time by 60%"
@@ -52,8 +52,8 @@ const portfolioData = {
         description: "Advanced Excel dashboard with 6AM-6AM shift cycle tracking, synchronized slicers, VBA automation, and real-time performance monitoring.",
         technologies: ["Excel", "VBA", "Pivot Tables", "Power Query"],
         images: [
-          "https://github.com/Yashdeep2/Portfolio/Weekly.png",
-          "https://github.com/Yashdeep2/Portfolio/Screenshot 2025-09-11 163518.png"
+          "Weekly.png",
+          "Screenshot 2025-09-11 163518.png"
         ],
         features: ["Automated data refresh", "Dynamic filtering", "Performance alerts", "Schedule optimization"],
         impact: "Optimized workforce efficiency by 35%"
@@ -63,8 +63,8 @@ const portfolioData = {
         description: "Complex inventory management system with demand forecasting, optimization algorithms, and automated reorder point calculations.",
         technologies: ["Excel", "VBA", "Solver", "Statistical Models"],
         images: [
-          "https://github.com/Yashdeep2/Portfolio/Screenshot 2025-09-11 163518.png",
-          "https://github.com/Yashdeep2/Portfolio/Weekly.png"
+          "Screenshot 2025-09-11 163518.png",
+          "Weekly.png"
         ],
         features: ["Demand forecasting", "Optimization models", "Cost analysis", "Automated alerts"],
         impact: "Reduced inventory costs by 25%"
@@ -76,7 +76,7 @@ const portfolioData = {
         description: "Responsive web application for data entry, processing, and visualization with custom algorithms and modern UI/UX design.",
         technologies: ["HTML5", "CSS3", "JavaScript", "GitHub Pages", "Chart.js"],
         images: [
-          "https://github.com/Yashdeep2/Portfolio/WEB.png"
+          "WEB.png"
         ],
         liveUrl: "https://yashdeep2.github.io/Stinger1",
         githubUrl: "https://github.com/Yashdeep2/Stinger1",
@@ -89,7 +89,7 @@ const portfolioData = {
         description: "Enterprise IoT solution monitoring air quality, temperature, and humidity with real-time alerts, data logging, and cloud integration.",
         technologies: ["Arduino", "ESP32", "Multiple Sensors", "AWS IoT", "Python"],
         images: [
-          "https://github.com/Yashdeep2/Portfolio/WEB.png" // Replace with actual IoT images when available
+          "WEB.png" // Replace with actual IoT images when available
         ],
         features: ["Real-time monitoring", "Mobile alerts", "Cloud dashboard", "Historical data analysis"],
         impact: "Improved environmental compliance by 50%"
@@ -99,7 +99,7 @@ const portfolioData = {
         description: "Intelligent solar panel optimization system with automatic sun tracking, efficiency monitoring, and predictive maintenance capabilities.",
         technologies: ["Raspberry Pi", "Python", "Motor Control", "Solar Panels", "Machine Learning"],
         images: [
-          "https://github.com/Yashdeep2/Portfolio/WEB.png" // Replace with actual solar tracking images when available
+          "WEB.png" // Replace with actual solar tracking images when available
         ],
         features: ["Sun tracking", "Efficiency monitoring", "Remote control", "Predictive maintenance"],
         impact: "Increased energy efficiency by 30%"
@@ -114,7 +114,7 @@ const portfolioData = {
         status: "Under Review",
         coAuthors: "Dr. Smith, Prof. Johnson",
         images: [
-          "https://github.com/Yashdeep2/Portfolio/Screenshot 2025-09-11 163408.png" // Replace with actual research images
+          "Screenshot 2025-09-11 163408.png" // Replace with actual research images
         ],
         abstract: "This research presents a novel approach to detecting manufacturing defects in solar modules using advanced machine learning techniques and computer vision algorithms, achieving 95% accuracy in defect classification."
       },
@@ -126,7 +126,7 @@ const portfolioData = {
         status: "Published",
         citations: "15",
         images: [
-          "https://github.com/Yashdeep2/Portfolio/Screenshot 2025-09-11 163442.png" // Replace with actual research images
+          "Screenshot 2025-09-11 163442.png" // Replace with actual research images
         ],
         abstract: "This paper explores the implementation of IoT-based monitoring systems for smart grid optimization, demonstrating 25% improvement in energy distribution efficiency through real-time data analytics."
       }
