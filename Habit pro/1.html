@@ -1,0 +1,1084 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>HabitForge Pro | Gamified Tracker</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Outfit', 'sans-serif'] },
+                    colors: { 
+                        background: '#09090b', 
+                        surface: '#18181b', 
+                        surfaceHighlight: '#27272a',
+                        primary: '#8b5cf6', 
+                        secondary: '#ec4899', 
+                        accent: '#3b82f6', 
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1)',
+                        'slide-up': 'slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1)',
+                        'grow-up': 'growUp 1s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    },
+                    keyframes: {
+                        fadeIn: { '0%': { opacity: '0' }, '100%': { opacity: '1' } },
+                        slideUp: { '0%': { transform: 'translateY(20px)', opacity: 0 }, '100%': { transform: 'translateY(0)', opacity: 1 } },
+                        growUp: { '0%': { height: '0%' }, '100%': { height: 'var(--target-height)' } }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        html, body { height: 100%; width: 100%; overflow: hidden; background-color: #09090b; color: white; -webkit-tap-highlight-color: transparent; }
+        
+        .mesh-gradient {
+            position: fixed; inset: 0; z-index: 0; pointer-events: none;
+            background: 
+                radial-gradient(at 0% 0%, rgba(139, 92, 246, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(236, 72, 153, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(59, 130, 246, 0.15) 0px, transparent 50%);
+            filter: blur(80px);
+        }
+
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 10px; }
+
+        .input-label { font-size: 0.75rem; font-weight: 600; color: #a1a1aa; text-transform: uppercase; margin-bottom: 6px; display: block; letter-spacing: 0.05em; }
+        .input-field {
+            width: 100%; background: #27272a; border: 1px solid #3f3f46; color: white; padding: 12px 16px; border-radius: 12px;
+            outline: none; transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .input-field:focus { border-color: #8b5cf6; box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.2); }
+        
+        .toast {
+            position: fixed; top: 24px; left: 50%; transform: translateX(-50%) translateY(-20px);
+            background: #18181b; border: 1px solid #3f3f46; color: white; padding: 12px 24px;
+            border-radius: 100px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            z-index: 100; opacity: 0; transition: all 0.3s; display: flex; align-items: center; gap: 10px; pointer-events: none;
+        }
+        .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+        .toast.error { border-color: #ef4444; color: #fca5a5; }
+
+        .modal-backdrop { position: fixed; inset: 0; z-index: 50; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
+        .modal-backdrop.active { opacity: 1; pointer-events: auto; }
+        .modal-content {
+            width: 90%; max-width: 450px; background: #18181b; border: 1px solid #3f3f46; border-radius: 24px;
+            transform: translateY(20px) scale(0.95); transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+            max-height: 85vh; display: flex; flex-direction: column;
+        }
+        .modal-backdrop.active .modal-content { transform: translateY(0) scale(1); }
+
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
+        .calendar-day {
+            aspect-ratio: 1; border-radius: 8px; display: flex; align-items: center; justify-content: center;
+            font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.2s;
+            background: #27272a; color: #a1a1aa; border: 1px solid transparent;
+        }
+        .calendar-day:hover { background: #3f3f46; }
+        .calendar-day.done { background: rgba(139, 92, 246, 0.2); color: #c4b5fd; border-color: rgba(139, 92, 246, 0.4); }
+        .calendar-day.today { border-color: white; }
+        .calendar-day.future { opacity: 0.3; pointer-events: none; }
+
+        /* New Heatmap Grid */
+        .heatmap-grid { display: grid; grid-template-columns: repeat(20, 1fr); gap: 4px; }
+        .heatmap-cell { aspect-ratio: 1; border-radius: 2px; background: #27272a; transition: background 0.3s; }
+    </style>
+</head>
+<body>
+
+    <div class="mesh-gradient"></div>
+
+    <div id="toast" class="toast">
+        <i id="toast-icon" class="ph-fill ph-check-circle text-green-500 text-xl"></i>
+        <span id="toast-msg" class="font-medium text-sm">Action Successful</span>
+    </div>
+
+    <div id="auth-modal" class="fixed inset-0 bg-[#09090b] z-[60] flex items-center justify-center p-4 transition-all duration-500">
+        <div class="w-full max-w-md bg-[#18181b] border border-white/10 rounded-2xl p-8 shadow-2xl relative overflow-hidden">
+             <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-violet-600 to-fuchsia-600"></div>
+            <div class="text-center mb-8">
+                <div class="w-16 h-16 bg-gradient-to-br from-violet-600 to-fuchsia-600 rounded-2xl mx-auto flex items-center justify-center shadow-lg shadow-violet-500/20 mb-4 border-4 border-[#18181b]">
+                    <i class="ph-bold ph-fire text-white text-3xl"></i>
+                </div>
+                <h2 class="text-2xl font-bold text-white">Welcome Back</h2>
+                <p class="text-gray-400 text-sm mt-2">Sign in to access your HabitForge.</p>
+            </div>
+            <div class="space-y-4">
+                <div>
+                    <label class="input-label">Email</label>
+                    <input type="email" id="auth-email" class="input-field" placeholder="name@example.com">
+                </div>
+                <div>
+                    <label class="input-label">Password</label>
+                    <input type="password" id="auth-pass" class="input-field" placeholder="••••••••">
+                </div>
+                <div id="auth-error" class="text-red-400 text-xs font-bold hidden text-center bg-red-500/10 p-2 rounded-lg border border-red-500/20"></div>
+                <button onclick="app.handleLogin()" id="btn-login" class="w-full bg-violet-600 hover:bg-violet-500 text-white py-3 rounded-xl font-bold transition-colors shadow-lg shadow-violet-600/20 active:scale-95 transform">Sign In</button>
+                <div class="flex items-center gap-3 my-4">
+                    <div class="h-px bg-white/10 flex-1"></div>
+                    <span class="text-[10px] text-gray-500 font-bold uppercase">New Here?</span>
+                    <div class="h-px bg-white/10 flex-1"></div>
+                </div>
+                <button onclick="app.handleSignup()" id="btn-signup" class="w-full bg-white/5 hover:bg-white/10 text-white border border-white/10 py-3 rounded-xl font-bold transition-colors active:scale-95 transform">Create Account</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="app" class="w-full h-full flex flex-col relative z-10 max-w-5xl mx-auto shadow-2xl bg-[#09090b]/50">
+        
+        <div id="loading-overlay" class="fixed inset-0 bg-[#09090b] z-50 flex items-center justify-center flex-col gap-4 transition-opacity duration-500">
+            <div class="w-12 h-12 border-4 border-violet-500/30 border-t-violet-500 rounded-full animate-spin"></div>
+            <p id="loading-text" class="text-gray-400 text-sm animate-pulse">Igniting Forge...</p>
+        </div>
+
+        <header class="h-16 px-6 flex justify-between items-center border-b border-white/5 bg-[#09090b]/80 backdrop-blur-md sticky top-0 z-30">
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-violet-600 to-fuchsia-600 flex items-center justify-center shadow-lg shadow-violet-500/20">
+                    <i class="ph-bold ph-fire text-white text-lg"></i>
+                </div>
+                <div>
+                    <h1 class="text-lg font-bold text-white leading-none">HabitForge</h1>
+                    <span class="text-[10px] font-bold text-violet-400 uppercase tracking-widest">Pro</span>
+                </div>
+            </div>
+            <div class="flex items-center gap-2">
+                <div class="hidden md:flex items-center gap-2 px-3 py-1.5 bg-white/5 rounded-full border border-white/5">
+                    <span class="text-xs text-gray-400 font-medium uppercase">Level</span>
+                    <span id="user-level-header" class="text-sm font-bold text-white">1</span>
+                </div>
+                <button onclick="app.logout()" class="w-9 h-9 rounded-full hover:bg-red-500/10 flex items-center justify-center text-red-400 transition-colors" title="Logout">
+                    <i class="ph-bold ph-sign-out text-xl"></i>
+                </button>
+                <button onclick="app.openModal('settings-modal')" class="w-9 h-9 rounded-full hover:bg-white/10 flex items-center justify-center text-gray-400 transition-colors">
+                    <i class="ph-bold ph-gear text-xl"></i>
+                </button>
+            </div>
+        </header>
+
+        <main id="main-content" class="flex-1 overflow-y-auto custom-scrollbar p-4 md:p-8 pb-28 md:pb-8 relative">
+            </main>
+
+        <nav class="md:hidden fixed bottom-0 left-0 w-full h-20 bg-[#09090b]/95 backdrop-blur-xl border-t border-white/10 flex justify-around items-center z-40 px-2 pb-2">
+            <button onclick="app.switchTab('dashboard')" class="nav-item active flex-1 flex flex-col items-center gap-1 p-2 rounded-xl transition-colors" data-tab="dashboard">
+                <i class="ph-fill ph-squares-four text-2xl mb-0.5"></i>
+                <span class="text-[10px] font-bold">Home</span>
+            </button>
+            <button onclick="app.openHabitModal()" class="w-12 h-12 -mt-6 bg-gradient-to-br from-violet-600 to-fuchsia-600 rounded-full flex items-center justify-center text-white shadow-lg shadow-violet-600/40 border-4 border-[#09090b] hover:scale-105 transition-transform">
+                <i class="ph-bold ph-plus text-2xl"></i>
+            </button>
+            <button onclick="app.switchTab('stats')" class="nav-item flex-1 flex flex-col items-center gap-1 p-2 rounded-xl transition-colors text-gray-500" data-tab="stats">
+                <i class="ph-bold ph-chart-bar text-2xl mb-0.5"></i>
+                <span class="text-[10px] font-bold">Stats</span>
+            </button>
+        </nav>
+
+        <div class="hidden md:flex fixed left-0 top-16 bottom-0 w-20 bg-[#09090b]/50 border-r border-white/5 flex-col items-center py-8 gap-6 z-20">
+             <button onclick="app.switchTab('dashboard')" class="nav-item-d w-10 h-10 rounded-xl flex items-center justify-center text-violet-400 bg-violet-500/10" data-tab="dashboard">
+                <i class="ph-fill ph-squares-four text-xl"></i>
+            </button>
+             <button onclick="app.switchTab('stats')" class="nav-item-d w-10 h-10 rounded-xl flex items-center justify-center text-gray-500 hover:text-white hover:bg-white/5 transition-colors" data-tab="stats">
+                <i class="ph-bold ph-chart-bar text-xl"></i>
+            </button>
+            <div class="flex-1"></div>
+            <button onclick="app.openHabitModal()" class="w-10 h-10 rounded-xl bg-violet-600 text-white flex items-center justify-center hover:scale-105 transition-transform shadow-lg shadow-violet-600/20">
+                <i class="ph-bold ph-plus"></i>
+            </button>
+        </div>
+    </div>
+
+    <div id="habit-modal" class="modal-backdrop">
+        <div class="modal-content">
+            <div class="h-14 border-b border-white/5 flex justify-between items-center px-5 bg-white/5">
+                <h2 id="habit-modal-title" class="font-bold text-white">Create New Habit</h2>
+                <button onclick="app.closeModal('habit-modal')" class="text-gray-400 hover:text-white"><i class="ph-bold ph-x text-lg"></i></button>
+            </div>
+            <div class="p-6 overflow-y-auto flex-1 custom-scrollbar">
+                <input type="hidden" id="habit-id">
+                <div class="input-group mb-4">
+                    <label class="input-label">Habit Title</label>
+                    <input type="text" id="habit-title" class="input-field" placeholder="e.g. Morning Meditation">
+                </div>
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div class="input-group mb-0">
+                        <label class="input-label">Daily Goal</label>
+                        <input type="number" id="habit-target" class="input-field" value="1" min="1">
+                    </div>
+                    <div class="input-group mb-0">
+                        <label class="input-label">Reminder Time</label>
+                        <input type="time" id="habit-time" class="input-field text-gray-300">
+                    </div>
+                </div>
+                <div class="input-group mb-4">
+                    <label class="input-label">Icon</label>
+                    <select id="habit-icon" class="input-field">
+                        <option value="ph-fire">🔥 Fire</option>
+                        <option value="ph-book-open">📖 Book</option>
+                        <option value="ph-barbell">💪 Gym</option>
+                        <option value="ph-drop">💧 Water</option>
+                        <option value="ph-moon">🌙 Sleep</option>
+                        <option value="ph-code">💻 Code</option>
+                        <option value="ph-money">💰 Money</option>
+                        <option value="ph-heart">❤️ Health</option>
+                    </select>
+                </div>
+                <div class="mb-6">
+                    <label class="input-label">Color Theme</label>
+                    <div class="grid grid-cols-6 gap-2 mt-2" id="color-picker"></div>
+                </div>
+                <div class="flex gap-3">
+                    <button onclick="app.saveHabit()" id="btn-save-habit" class="flex-1 bg-violet-600 hover:bg-violet-500 text-white py-3 rounded-xl font-bold shadow-lg shadow-violet-600/20 transition-transform active:scale-95">Save Habit</button>
+                    <button id="btn-delete" onclick="app.deleteHabit()" class="hidden px-4 bg-red-500/10 text-red-500 rounded-xl hover:bg-red-500/20 font-bold transition-colors"><i class="ph-bold ph-trash"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="calendar-modal" class="modal-backdrop">
+        <div class="modal-content">
+            <div class="h-14 border-b border-white/5 flex justify-between items-center px-5 bg-white/5">
+                <h2 class="font-bold text-white flex items-center gap-2">
+                    <i class="ph-bold ph-calendar-blank text-violet-400"></i> History
+                </h2>
+                <button onclick="app.closeModal('calendar-modal')" class="text-gray-400 hover:text-white"><i class="ph-bold ph-x text-lg"></i></button>
+            </div>
+            <div class="p-6">
+                <p class="text-sm text-gray-400 mb-4">Click any past date to toggle completion status.</p>
+                <div class="flex justify-between mb-2 text-xs font-bold text-gray-500 uppercase">
+                    <span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
+                </div>
+                <div id="calendar-grid" class="calendar-grid"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="ai-modal" class="modal-backdrop">
+        <div class="modal-content">
+            <div class="h-14 border-b border-white/5 flex justify-between items-center px-5 bg-gradient-to-r from-violet-900/20 to-fuchsia-900/20">
+                <h2 class="font-bold text-white flex items-center gap-2"><i class="ph-fill ph-sparkle text-fuchsia-400"></i> AI Assistant</h2>
+                <button onclick="app.closeModal('ai-modal')" class="text-gray-400"><i class="ph-bold ph-x text-lg"></i></button>
+            </div>
+            <div class="p-6">
+                <div id="ai-input-step">
+                    <label class="input-label text-gray-300">What is your main goal?</label>
+                    <textarea id="ai-prompt" class="input-field h-32 resize-none mb-4" placeholder="e.g. I want to learn Python in 30 days."></textarea>
+                    <button onclick="app.generateAI()" id="btn-ai-go" class="w-full bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white py-3 rounded-xl font-bold shadow-lg shadow-fuchsia-600/20 flex items-center justify-center gap-2">
+                        <i class="ph-bold ph-magic-wand"></i> Generate Plan
+                    </button>
+                </div>
+                <div id="ai-result-step" class="hidden space-y-3"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="settings-modal" class="modal-backdrop">
+        <div class="modal-content">
+            <div class="h-14 border-b border-white/5 flex justify-between items-center px-5">
+                <h2 class="font-bold text-white">Settings & Rewards</h2>
+                <button onclick="app.closeModal('settings-modal')" class="text-gray-400"><i class="ph-bold ph-x text-lg"></i></button>
+            </div>
+            <div class="p-6">
+                <button onclick="app.requestNotificationPermission()" class="w-full mb-6 bg-violet-600/10 hover:bg-violet-600/20 text-violet-400 border border-violet-600/20 py-3 rounded-xl font-bold transition-colors flex items-center justify-center gap-2">
+                    <i class="ph-bold ph-bell"></i> Enable Notifications
+                </button>
+                <p class="text-xs text-gray-500 uppercase font-bold mb-3">Streak Milestones (Days)</p>
+                <div id="settings-list" class="space-y-3"></div>
+                <button onclick="app.saveSettings()" class="w-full mt-6 bg-white/10 hover:bg-white/20 text-white py-3 rounded-xl font-bold transition-colors">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="confetti-container" class="fixed inset-0 pointer-events-none z-50 flex justify-center overflow-hidden"></div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        // IMPORTED 'increment' HERE
+        import { getFirestore, collection, doc, setDoc, updateDoc, onSnapshot, deleteDoc, query, increment } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        // --- CONFIGURATION ---
+        const GEMINI_API_KEY = "AIzaSyAfXn06uN0JzWEdruE0wbLvi6ARIj2rNWM";
+        const MOTIVATIONAL_QUOTES = [
+            "Success is the sum of small efforts repeated day in and day out.",
+            "The secret of your future is hidden in your daily routine.",
+            "Don't watch the clock; do what it does. Keep going.",
+            "Your only limit is you.",
+            "Discipline is doing what needs to be done, even if you don't want to.",
+            "The difference between who you are and who you want to be is what you do.",
+            "Habits are the compound interest of self-improvement."
+        ];
+        
+        let firebaseConfig;
+        let appId;
+        let authReady = false; 
+
+        if (typeof __firebase_config !== 'undefined') {
+            firebaseConfig = JSON.parse(__firebase_config);
+            appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        } else {
+            firebaseConfig = {
+                apiKey: "AIzaSyDEbZo_jlgZY4NjvpZhLZ1IztX21RQdJZs",
+                authDomain: "habit-7583c.firebaseapp.com",
+                projectId: "habit-7583c",
+                storageBucket: "habit-7583c.firebasestorage.app",
+                messagingSenderId: "1010876007948",
+                appId: "1:1010876007948:web:fd0d54ef5ae4ae81171029"
+            };
+            appId = "habit-forge-manual-v2";
+        }
+
+        // --- INIT SERVICES ---
+        const firebaseApp = initializeApp(firebaseConfig);
+        const auth = getAuth(firebaseApp);
+        const db = getFirestore(firebaseApp);
+
+        // --- STATE ---
+        const store = {
+            user: null,
+            habits: [],
+            settings: {
+                tiers: [
+                    { days: 3, label: 'Spark', color: '#fbbf24' },
+                    { days: 7, label: 'Flame', color: '#f97316' },
+                    { days: 21, label: 'Blaze', color: '#a855f7' },
+                    { days: 66, label: 'Legend', color: '#22c55e' }
+                ]
+            },
+            colors: [
+                { id: 'violet', hex: '#8b5cf6' },
+                { id: 'pink', hex: '#ec4899' },
+                { id: 'blue', hex: '#3b82f6' },
+                { id: 'emerald', hex: '#10b981' },
+                { id: 'amber', hex: '#f59e0b' },
+                { id: 'rose', hex: '#f43f5e' }
+            ],
+            currentTab: 'dashboard',
+            editingId: null,
+            viewingHabitId: null,
+            xp: 0,
+            level: 1,
+            notifiedMinutes: new Set()
+        };
+
+        // --- HELPERS ---
+        const helpers = {
+            toast: (msg, type = 'success') => {
+                const el = document.getElementById('toast');
+                const txt = document.getElementById('toast-msg');
+                const icon = document.getElementById('toast-icon');
+                txt.innerText = msg;
+                if (type === 'error') {
+                    el.classList.add('error');
+                    icon.className = "ph-fill ph-warning-circle text-red-500 text-xl";
+                } else {
+                    el.classList.remove('error');
+                    icon.className = "ph-fill ph-check-circle text-green-500 text-xl";
+                }
+                el.classList.add('show');
+                setTimeout(() => el.classList.remove('show'), 3000);
+            },
+            confetti: () => {
+                const container = document.getElementById('confetti-container');
+                const colors = ['#8b5cf6', '#ec4899', '#3b82f6'];
+                for(let i=0; i<40; i++) {
+                    const el = document.createElement('div');
+                    el.style.position = 'absolute';
+                    el.style.width = '8px'; el.style.height = '8px';
+                    el.style.background = colors[Math.floor(Math.random() * colors.length)];
+                    el.style.left = '50%'; el.style.top = '50%';
+                    el.style.borderRadius = '2px';
+                    el.style.pointerEvents = 'none';
+                    container.appendChild(el);
+                    const angle = Math.random() * Math.PI * 2;
+                    const velocity = 5 + Math.random() * 10;
+                    const tx = Math.cos(angle) * velocity * 20;
+                    const ty = Math.sin(angle) * velocity * 20;
+                    el.animate([
+                        { transform: 'translate(0,0) rotate(0deg)', opacity: 1 },
+                        { transform: `translate(${tx}px, ${ty}px) rotate(720deg)`, opacity: 0 }
+                    ], { duration: 800 + Math.random() * 400, easing: 'cubic-bezier(0.25, 1, 0.5, 1)' })
+                    .onfinish = () => el.remove();
+                }
+            },
+            calculateStreak: (habit) => {
+                if (!habit.completions) return 0;
+                const dates = Object.keys(habit.completions).sort((a, b) => new Date(b) - new Date(a));
+                const today = new Date().toISOString().split('T')[0];
+                const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+                const isDone = d => (habit.completions[d] || 0) >= (habit.target || 1);
+                const lastDone = dates.find(d => isDone(d));
+                if (!lastDone || (lastDone !== today && lastDone !== yesterday)) return 0;
+                let streak = 0;
+                let curr = new Date(lastDone);
+                for(let i=0; i<365; i++) {
+                    if (isDone(curr.toISOString().split('T')[0])) {
+                        streak++;
+                        curr.setDate(curr.getDate() - 1);
+                    } else break;
+                }
+                return streak;
+            },
+            getPast7Days: () => {
+                const days = [];
+                for (let i = 6; i >= 0; i--) {
+                    const d = new Date();
+                    d.setDate(d.getDate() - i);
+                    days.push({
+                        date: d.toISOString().split('T')[0],
+                        dayName: d.toLocaleDateString('en-US', { weekday: 'short' })
+                    });
+                }
+                return days;
+            },
+            getRandomQuote: () => MOTIVATIONAL_QUOTES[Math.floor(Math.random() * MOTIVATIONAL_QUOTES.length)]
+        };
+
+        // --- RENDER ENGINE ---
+        const render = {
+            init: () => {
+                render.nav();
+                if(store.currentTab === 'dashboard') render.dashboard();
+                else render.stats();
+            },
+            hideLoading: () => {
+                const overlay = document.getElementById('loading-overlay');
+                if(overlay && !overlay.classList.contains('hidden')) {
+                    overlay.style.opacity = '0';
+                    setTimeout(() => {
+                         overlay.classList.add('hidden');
+                         overlay.style.display = 'none';
+                    }, 500);
+                }
+            },
+            nav: () => {
+                document.querySelectorAll('.nav-item').forEach(el => {
+                    const active = el.dataset.tab === store.currentTab;
+                    el.className = `nav-item flex-1 flex flex-col items-center gap-1 p-2 rounded-xl transition-colors ${active ? 'text-violet-400 bg-white/5' : 'text-gray-500'}`;
+                    el.querySelector('i').classList.toggle('ph-fill', active);
+                    el.querySelector('i').classList.toggle('ph-bold', !active);
+                });
+                document.querySelectorAll('.nav-item-d').forEach(el => {
+                    const active = el.dataset.tab === store.currentTab;
+                    if(active) {
+                        el.className = "nav-item-d w-10 h-10 rounded-xl flex items-center justify-center text-violet-400 bg-violet-500/10 ring-1 ring-violet-500/20";
+                        el.querySelector('i').classList.replace('ph-bold', 'ph-fill');
+                    } else {
+                        el.className = "nav-item-d w-10 h-10 rounded-xl flex items-center justify-center text-gray-500 hover:text-white hover:bg-white/5 transition-colors";
+                        el.querySelector('i').classList.replace('ph-fill', 'ph-bold');
+                    }
+                });
+            },
+            dashboard: () => {
+                const main = document.getElementById('main-content');
+                const levelProgress = (store.xp % 100); 
+                
+                let html = `
+                    <div class="mb-6 bg-gradient-to-r from-violet-900/40 to-fuchsia-900/40 border border-white/5 p-5 rounded-2xl relative overflow-hidden animate-fade-in">
+                         <div class="absolute right-0 top-0 p-4 opacity-10"><i class="ph-fill ph-crown text-6xl"></i></div>
+                         <div class="relative z-10">
+                             <h2 class="text-lg font-bold text-white mb-1">Level ${store.level}</h2>
+                             <p class="text-gray-400 text-xs mb-4 italic">"${helpers.getRandomQuote()}"</p>
+                             <div class="w-full h-2 bg-gray-800 rounded-full overflow-hidden">
+                                 <div class="h-full bg-gradient-to-r from-violet-500 to-fuchsia-500 progress-fill" style="width: ${levelProgress}%"></div>
+                             </div>
+                             <div class="text-right mt-1 text-[10px] font-bold text-violet-300">${store.xp} XP Total</div>
+                         </div>
+                    </div>
+
+                    <div class="flex justify-between items-end mb-4">
+                        <h3 class="text-lg font-bold text-white">Your Habits</h3>
+                        <button onclick="app.openModal('ai-modal')" class="px-3 py-1.5 bg-white/5 hover:bg-white/10 border border-white/5 rounded-lg text-xs font-bold text-fuchsia-300 flex items-center gap-1.5 transition-colors">
+                            <i class="ph-bold ph-sparkle"></i> AI Assistant
+                        </button>
+                    </div>
+
+                    <div class="space-y-3 pb-20">`;
+
+                if(store.habits.length === 0) {
+                    html += `
+                        <div class="py-12 border border-dashed border-gray-800 rounded-2xl flex flex-col items-center justify-center text-center text-gray-500 bg-gray-900/20">
+                            <i class="ph-duotone ph-plant text-4xl mb-2 opacity-50"></i>
+                            <p>No habits yet.</p>
+                            <button onclick="app.openHabitModal()" class="mt-3 text-violet-400 font-bold text-sm hover:underline">Create One</button>
+                        </div>`;
+                } else {
+                    store.habits.forEach(h => {
+                        const today = new Date().toISOString().split('T')[0];
+                        const doneCount = h.completions?.[today] || 0;
+                        const target = h.target || 1;
+                        const isDone = doneCount >= target;
+                        const colorHex = store.colors.find(c => c.id === h.color)?.hex || '#8b5cf6';
+                        const streak = helpers.calculateStreak(h);
+                        const progress = Math.min((doneCount / target) * 100, 100);
+
+                        html += `
+                        <div class="group relative bg-[#18181b] border ${isDone ? 'border-gray-800 opacity-60' : 'border-white/5 hover:border-white/10'} p-4 rounded-2xl transition-all overflow-hidden animate-slide-up">
+                            <div class="absolute bottom-0 left-0 h-1 bg-gray-800 w-full">
+                                <div class="h-full transition-all duration-500" style="width: ${progress}%; background-color: ${colorHex}"></div>
+                            </div>
+                            
+                            <div class="flex items-center gap-4">
+                                <div onclick="app.editHabit('${h.id}')" class="w-12 h-12 rounded-xl flex items-center justify-center text-xl shrink-0 cursor-pointer hover:scale-105 transition-transform" style="background: ${colorHex}20; color: ${colorHex};">
+                                    <i class="ph-fill ${h.icon || 'ph-fire'}"></i>
+                                </div>
+                                
+                                <div class="flex-1 min-w-0" onclick="app.editHabit('${h.id}')">
+                                    <h4 class="font-bold text-white truncate text-base ${isDone ? 'line-through text-gray-500' : ''}">${h.title}</h4>
+                                    <div class="flex items-center gap-3 mt-1">
+                                        <span class="text-xs text-gray-500 flex items-center gap-1 font-medium">
+                                            <i class="ph-bold ph-fire text-orange-500 ${streak > 0 ? 'animate-pulse-slow' : ''}"></i> ${streak} Day Streak
+                                        </span>
+                                        ${h.reminderTime ? `<span class="text-[10px] bg-white/5 px-1.5 py-0.5 rounded text-gray-400 font-mono"><i class="ph-bold ph-bell"></i> ${h.reminderTime}</span>` : ''}
+                                    </div>
+                                </div>
+
+                                <button onclick="app.openCalendar('${h.id}')" class="w-9 h-9 rounded-lg flex items-center justify-center text-gray-500 hover:text-white hover:bg-white/5 transition-colors" title="History">
+                                    <i class="ph-bold ph-calendar-blank text-lg"></i>
+                                </button>
+
+                                <button onclick="app.toggleHabit('${h.id}')" class="w-11 h-11 rounded-xl flex items-center justify-center transition-all active:scale-90 shadow-lg" 
+                                    style="${isDone ? `background: ${colorHex}; color: white;` : 'background: #27272a; color: #71717a;'}">
+                                    ${isDone ? '<i class="ph-bold ph-check text-xl"></i>' : `<span class="text-xs font-bold">${doneCount}/${target}</span>`}
+                                </button>
+                            </div>
+                        </div>`;
+                    });
+                }
+                html += `</div>`;
+                main.innerHTML = html;
+                document.getElementById('user-level-header').innerText = store.level;
+            },
+
+            stats: () => {
+                const main = document.getElementById('main-content');
+                const totalCompletions = store.habits.reduce((acc, h) => acc + Object.keys(h.completions || {}).length, 0);
+                const bestStreak = store.habits.reduce((max, h) => Math.max(max, helpers.calculateStreak(h)), 0);
+
+                // 1. Weekly Graph Logic
+                const past7Days = helpers.getPast7Days();
+                let maxWeeklyCompletions = 0;
+                const weeklyData = past7Days.map(day => {
+                    let count = 0;
+                    store.habits.forEach(h => {
+                        if ((h.completions?.[day.date] || 0) >= (h.target || 1)) count++;
+                    });
+                    if (count > maxWeeklyCompletions) maxWeeklyCompletions = count;
+                    return { day: day.dayName, count: count, fullDate: day.date };
+                });
+
+                const graphHtml = weeklyData.map((d, i) => {
+                    const height = maxWeeklyCompletions > 0 ? (d.count / maxWeeklyCompletions) * 100 : 0;
+                    const isToday = i === 6; // Last element is today
+                    return `
+                        <div class="flex flex-col items-center gap-2 flex-1 group">
+                            <div class="w-full bg-[#27272a] rounded-t-lg flex items-end relative h-32 overflow-hidden">
+                                <div class="w-full bg-violet-500/80 group-hover:bg-violet-400 transition-all animate-grow-up ${isToday ? 'animate-pulse bg-violet-500' : ''}" style="--target-height: ${height}%"></div>
+                                ${d.count > 0 ? `<div class="absolute top-1 w-full text-center text-[10px] text-white font-bold opacity-0 group-hover:opacity-100 transition-opacity">${d.count}</div>` : ''}
+                            </div>
+                            <span class="text-[10px] font-bold uppercase ${isToday ? 'text-white' : 'text-gray-500'}">${d.day}</span>
+                        </div>
+                    `;
+                }).join('');
+
+                // 2. Global Heatmap Logic (Yearly View)
+                let heatmapHtml = '';
+                const today = new Date();
+                for(let i=160; i>=0; i--) { // Show last ~5 months to fit mobile
+                    const d = new Date();
+                    d.setDate(today.getDate() - i);
+                    const dateStr = d.toISOString().split('T')[0];
+                    
+                    let totalCompleted = 0;
+                    store.habits.forEach(h => {
+                        if ((h.completions?.[dateStr] || 0) >= (h.target || 1)) totalCompleted++;
+                    });
+
+                    let bgClass = 'bg-[#27272a]';
+                    if (totalCompleted > 0) bgClass = 'bg-violet-900/50';
+                    if (totalCompleted > 2) bgClass = 'bg-violet-700/70';
+                    if (totalCompleted > 4) bgClass = 'bg-violet-500';
+
+                    heatmapHtml += `<div class="heatmap-cell ${bgClass}" title="${dateStr}: ${totalCompleted} done"></div>`;
+                }
+
+                // 3. Tiers Logic
+                let tiersHtml = store.settings.tiers.map(t => {
+                     const unlockedCount = store.habits.filter(h => helpers.calculateStreak(h) >= t.days).length;
+                     return `
+                        <div class="bg-[#18181b] border border-white/5 p-3 rounded-xl flex flex-col items-center gap-2 ${unlockedCount > 0 ? 'opacity-100 ring-1 ring-white/10' : 'opacity-40 grayscale'}">
+                            <div class="w-10 h-10 rounded-full flex items-center justify-center text-white text-lg shadow-lg" style="background: ${t.color}">${unlockedCount}</div>
+                            <div class="text-center">
+                                <div class="text-xs font-bold text-white">${t.label}</div>
+                                <div class="text-[10px] text-gray-500 font-mono">${t.days} Days</div>
+                            </div>
+                        </div>
+                      `;
+                }).join('');
+
+                main.innerHTML = `
+                    <div class="space-y-6 animate-fade-in">
+                        
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="bg-[#18181b] p-5 rounded-2xl border border-white/5 relative overflow-hidden">
+                                <div class="absolute top-0 right-0 p-3 opacity-10 text-4xl"><i class="ph-fill ph-check-circle"></i></div>
+                                <div class="text-gray-500 text-xs font-bold uppercase mb-1">Total Done</div>
+                                <div class="text-3xl font-bold text-white">${totalCompletions}</div>
+                            </div>
+                            <div class="bg-[#18181b] p-5 rounded-2xl border border-white/5 relative overflow-hidden">
+                                <div class="absolute top-0 right-0 p-3 opacity-10 text-4xl"><i class="ph-fill ph-fire"></i></div>
+                                <div class="text-gray-500 text-xs font-bold uppercase mb-1">Best Streak</div>
+                                <div class="text-3xl font-bold text-orange-500">${bestStreak} <span class="text-sm text-gray-500">days</span></div>
+                            </div>
+                        </div>
+
+                        <div class="bg-[#18181b] p-6 rounded-2xl border border-white/5">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="text-sm font-bold text-gray-400 uppercase">Last 7 Days</h3>
+                                <span class="text-xs text-violet-400 font-bold bg-violet-500/10 px-2 py-1 rounded-lg">Weekly Activity</span>
+                            </div>
+                            <div class="flex justify-between gap-2 h-40 items-end">
+                                ${graphHtml}
+                            </div>
+                        </div>
+
+                        <div class="bg-[#18181b] p-6 rounded-2xl border border-white/5">
+                            <h3 class="text-sm font-bold text-gray-400 uppercase mb-4">Consistency Map</h3>
+                            <div class="heatmap-grid">
+                                ${heatmapHtml}
+                            </div>
+                            <div class="flex items-center gap-2 mt-3 justify-end text-[10px] text-gray-500">
+                                <span>Less</span>
+                                <div class="w-3 h-3 bg-[#27272a] rounded-sm"></div>
+                                <div class="w-3 h-3 bg-violet-900/50 rounded-sm"></div>
+                                <div class="w-3 h-3 bg-violet-500 rounded-sm"></div>
+                                <span>More</span>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h3 class="text-sm font-bold text-gray-400 uppercase mb-3">Reward Badges</h3>
+                            <div class="grid grid-cols-4 gap-2">
+                                ${tiersHtml}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            },
+
+            calendar: (habitId) => {
+                const h = store.habits.find(x => x.id === habitId);
+                if(!h) return;
+                const grid = document.getElementById('calendar-grid');
+                grid.innerHTML = '';
+                const today = new Date();
+                const year = today.getFullYear();
+                const month = today.getMonth();
+                const firstDay = new Date(year, month, 1);
+                const lastDay = new Date(year, month + 1, 0);
+                const daysInMonth = lastDay.getDate();
+                const startDay = firstDay.getDay(); 
+
+                for(let i=0; i<startDay; i++) {
+                    const el = document.createElement('div');
+                    el.className = 'calendar-day future';
+                    grid.appendChild(el);
+                }
+                for(let i=1; i<=daysInMonth; i++) {
+                    const date = new Date(year, month, i);
+                    const dateStr = date.toISOString().split('T')[0];
+                    const isToday = i === today.getDate() && month === new Date().getMonth();
+                    const isFuture = date > today;
+                    const doneCount = h.completions?.[dateStr] || 0;
+                    const isDone = doneCount >= (h.target || 1);
+                    const el = document.createElement('div');
+                    el.className = `calendar-day ${isToday ? 'today' : ''} ${isFuture ? 'future' : ''} ${isDone ? 'done' : ''}`;
+                    el.innerText = i;
+                    if(!isFuture) {
+                        el.onclick = () => app.toggleHistoryDate(habitId, dateStr);
+                    }
+                    grid.appendChild(el);
+                }
+            },
+
+            settingsList: () => {
+                const list = document.getElementById('settings-list');
+                list.innerHTML = store.settings.tiers.map((t, i) => `
+                    <div class="flex items-center gap-3 bg-[#27272a] p-3 rounded-xl border border-white/5">
+                        <div class="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold" style="background: ${t.color}">${t.days}</div>
+                        <input type="text" value="${t.label}" onchange="app.updateTier(${i}, 'label', this.value)" class="bg-transparent text-white font-bold text-sm w-full outline-none border-b border-transparent focus:border-white/20">
+                        <input type="number" value="${t.days}" onchange="app.updateTier(${i}, 'days', this.value)" class="bg-[#18181b] text-white text-xs font-mono w-14 text-center p-1 rounded border border-white/10">
+                    </div>
+                `).join('');
+            },
+
+            colorPicker: (selectedColor) => {
+                const container = document.getElementById('color-picker');
+                container.innerHTML = store.colors.map(c => `
+                    <button type="button" onclick="app.selectColor('${c.id}')" 
+                        class="w-8 h-8 rounded-full transition-transform hover:scale-110 flex items-center justify-center ${c.id === selectedColor ? 'ring-2 ring-white ring-offset-2 ring-offset-[#18181b]' : 'opacity-50'}" 
+                        style="background: ${c.hex}">
+                        ${c.id === selectedColor ? '<i class="ph-bold ph-check text-white text-xs"></i>' : ''}
+                    </button>
+                `).join('');
+            }
+        };
+
+        // --- APP ACTIONS ---
+        window.app = {
+            switchTab: (tab) => { store.currentTab = tab; render.init(); },
+            openModal: (id) => {
+                document.getElementById(id).classList.add('active');
+                if(id === 'settings-modal') render.settingsList();
+            },
+            closeModal: (id) => document.getElementById(id).classList.remove('active'),
+
+            handleLogin: async () => {
+                const email = document.getElementById('auth-email').value;
+                const pass = document.getElementById('auth-pass').value;
+                const errDiv = document.getElementById('auth-error');
+                const btn = document.getElementById('btn-login');
+
+                if(!email || !pass) {
+                    errDiv.innerText = "Please enter email and password";
+                    errDiv.classList.remove('hidden');
+                    return;
+                }
+
+                try {
+                    btn.innerHTML = '<i class="ph-bold ph-spinner animate-spin"></i>';
+                    btn.disabled = true;
+                    await signInWithEmailAndPassword(auth, email, pass);
+                } catch (error) {
+                    console.error(error);
+                    errDiv.innerText = "Invalid email or password.";
+                    errDiv.classList.remove('hidden');
+                    btn.innerHTML = 'Sign In';
+                    btn.disabled = false;
+                }
+            },
+
+            handleSignup: async () => {
+                const email = document.getElementById('auth-email').value;
+                const pass = document.getElementById('auth-pass').value;
+                const errDiv = document.getElementById('auth-error');
+                
+                if(!email || !pass) {
+                    errDiv.innerText = "Please enter email and password";
+                    errDiv.classList.remove('hidden');
+                    return;
+                }
+                if(pass.length < 6) {
+                    errDiv.innerText = "Password must be at least 6 chars";
+                    errDiv.classList.remove('hidden');
+                    return;
+                }
+
+                try {
+                    if(confirm("Create new account with this email?")) {
+                        await createUserWithEmailAndPassword(auth, email, pass);
+                        helpers.toast("Account Created!");
+                    }
+                } catch (error) {
+                    console.error(error);
+                    let msg = "Error creating account.";
+                    if(error.code === 'auth/email-already-in-use') msg = "Email already exists.";
+                    errDiv.innerText = msg;
+                    errDiv.classList.remove('hidden');
+                }
+            },
+
+            logout: async () => {
+                await signOut(auth);
+                window.location.reload();
+            },
+
+            openCalendar: (habitId) => {
+                store.viewingHabitId = habitId;
+                render.calendar(habitId);
+                app.openModal('calendar-modal');
+            },
+
+            toggleHistoryDate: async (habitId, dateStr) => {
+                if (!authReady || !store.user) return helpers.toast("Authentication required to save.", "error");
+                const h = store.habits.find(x => x.id === habitId);
+                if(!h) return;
+                let currentVal = h.completions?.[dateStr] || 0;
+                const target = h.target || 1;
+                let nextVal = (currentVal >= target) ? 0 : target;
+                const completions = { ...h.completions };
+                if(nextVal > 0) completions[dateStr] = nextVal;
+                else delete completions[dateStr];
+                try {
+                    await updateDoc(doc(db, 'artifacts', appId, 'users', store.user.uid, 'habits', habitId), { completions });
+                    render.calendar(habitId); 
+                } catch (e) {
+                    helpers.toast("Permission denied to update history.", "error");
+                }
+            },
+
+            openHabitModal: () => {
+                store.editingId = null;
+                document.getElementById('habit-modal-title').innerText = "Create New Habit";
+                document.getElementById('habit-title').value = "";
+                document.getElementById('habit-target').value = 1;
+                document.getElementById('habit-time').value = "";
+                document.getElementById('btn-delete').classList.add('hidden');
+                render.colorPicker('violet');
+                document.getElementById('color-picker').dataset.selected = 'violet';
+                app.openModal('habit-modal');
+            },
+
+            editHabit: (id) => {
+                const h = store.habits.find(x => x.id === id);
+                store.editingId = id;
+                document.getElementById('habit-modal-title').innerText = "Edit Habit";
+                document.getElementById('habit-title').value = h.title;
+                document.getElementById('habit-target').value = h.target || 1;
+                document.getElementById('habit-icon').value = h.icon || 'ph-fire';
+                document.getElementById('habit-time').value = h.reminderTime || "";
+                document.getElementById('btn-delete').classList.remove('hidden');
+                render.colorPicker(h.color || 'violet');
+                document.getElementById('color-picker').dataset.selected = h.color || 'violet';
+                app.openModal('habit-modal');
+            },
+
+            selectColor: (colorId) => {
+                render.colorPicker(colorId);
+                document.getElementById('color-picker').dataset.selected = colorId;
+            },
+
+            saveHabit: async () => {
+                const btn = document.getElementById('btn-save-habit');
+                if (!authReady || !store.user) {
+                    helpers.toast("Authentication not ready. Please wait a moment.", "error");
+                    return;
+                }
+                try {
+                    const title = document.getElementById('habit-title').value;
+                    if(!title.trim()) return helpers.toast("Title is required!", "error");
+                    btn.disabled = true;
+                    btn.innerHTML = `<i class="ph-bold ph-spinner animate-spin"></i> Saving...`;
+                    const color = document.getElementById('color-picker').dataset.selected || 'violet';
+                    const target = parseInt(document.getElementById('habit-target').value) || 1;
+                    const icon = document.getElementById('habit-icon').value;
+                    const reminderTime = document.getElementById('habit-time').value;
+                    const data = { title, color, target, icon, reminderTime, createdAt: new Date().toISOString() };
+                    const id = store.editingId || crypto.randomUUID();
+                    await setDoc(doc(db, 'artifacts', appId, 'users', store.user.uid, 'habits', id), data, { merge: true });
+                    helpers.toast(store.editingId ? "Habit Updated" : "Habit Created");
+                    app.closeModal('habit-modal');
+                } catch (e) {
+                    console.error("Save Habit Error:", e);
+                    helpers.toast(`Failed: ${e.message.includes('permission') ? 'Missing or insufficient permission.' : 'Database error.'}`, "error");
+                } finally {
+                    btn.disabled = false;
+                    btn.innerHTML = "Save Habit";
+                }
+            },
+
+            deleteHabit: async () => {
+                if (!authReady || !store.user) return helpers.toast("Authentication required.", "error");
+                if(confirm("Delete this habit?")) {
+                    try {
+                        await deleteDoc(doc(db, 'artifacts', appId, 'users', store.user.uid, 'habits', store.editingId));
+                        app.closeModal('habit-modal');
+                        helpers.toast("Habit Deleted");
+                    } catch (e) {
+                        helpers.toast("Permission denied to delete habit.", "error");
+                    }
+                }
+            },
+
+            // --- FIXED XP TOGGLE LOGIC ---
+            toggleHabit: async (id) => {
+                if (!authReady || !store.user) return helpers.toast("Authentication required.", "error");
+                const habitIndex = store.habits.findIndex(x => x.id === id);
+                if(habitIndex === -1) return;
+                const h = store.habits[habitIndex];
+                
+                const today = new Date().toISOString().split('T')[0];
+                let curr = h.completions?.[today] || 0;
+                const target = h.target || 1;
+                let next = curr + 1;
+                
+                // Reset if done, otherwise increment
+                if(curr >= target) next = 0; 
+                else if(next >= target) helpers.confetti(); 
+
+                const originalCompletions = { ...h.completions }; 
+                const newCompletions = { ...h.completions };
+                
+                if(next > 0) newCompletions[today] = next;
+                else delete newCompletions[today];
+                
+                // Optimistic UI update
+                store.habits[habitIndex].completions = newCompletions;
+                render.dashboard(); 
+                
+                try {
+                    await updateDoc(doc(db, 'artifacts', appId, 'users', store.user.uid, 'habits', id), { completions: newCompletions });
+                    
+                    // --- NEW: Smart XP Calculation ---
+                    const xpRef = doc(db, 'artifacts', appId, 'users', store.user.uid, 'stats', 'xp');
+
+                    if (next >= target && curr < target) {
+                        // CASE 1: Task Completed -> Add 10 XP
+                        await updateDoc(xpRef, { val: increment(10) });
+                    } 
+                    else if (curr >= target && next < target) {
+                        // CASE 2: Task Undone -> Subtract 10 XP
+                        // We check against 0 to prevent negative XP issues if needed, but increment handles negative fine
+                         await updateDoc(xpRef, { val: increment(-10) });
+                    }
+
+                } catch(e) {
+                    console.error("Sync Failed", e);
+                    store.habits[habitIndex].completions = originalCompletions;
+                    render.dashboard();
+                    helpers.toast("Failed to save. Check connection.", "error");
+                }
+            },
+
+            requestNotificationPermission: () => {
+                if (!("Notification" in window)) {
+                    helpers.toast("This browser does not support notifications.", "error");
+                } else {
+                    Notification.requestPermission().then(permission => {
+                        if (permission === "granted") helpers.toast("Notifications enabled!");
+                        else helpers.toast("Permission denied.", "error");
+                    });
+                }
+            },
+
+            updateTier: (idx, field, val) => { store.settings.tiers[idx][field] = field === 'days' ? parseInt(val) : val; },
+            saveSettings: async () => {
+                if (!authReady || !store.user) return helpers.toast("Authentication required.", "error");
+                try {
+                    await setDoc(doc(db, 'artifacts', appId, 'users', store.user.uid, 'settings', 'config'), store.settings, { merge: true });
+                    helpers.toast("Settings Saved");
+                    app.closeModal('settings-modal');
+                } catch (e) {
+                    helpers.toast("Permission denied to save settings.", "error");
+                }
+            },
+
+            generateAI: async () => {
+                const btn = document.getElementById('btn-ai-go');
+                const promptText = document.getElementById('ai-prompt').value;
+                if(!promptText) return;
+                btn.innerText = "Thinking...";
+                btn.disabled = true;
+                try {
+                    const prompt = `You are a habit coach. Goal: "${promptText}". Suggest 3 habits. Return raw JSON: [{"title": "...", "target": 1, "icon": "ph-book"}]`;
+                    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+                    });
+                    const data = await res.json();
+                    let text = data.candidates[0].content.parts[0].text;
+                    text = text.replace(/```json/g, '').replace(/```/g, '').trim();
+                    const suggestions = JSON.parse(text);
+                    const container = document.getElementById('ai-result-step');
+                    container.innerHTML = suggestions.map(s => `
+                        <div class="bg-white/5 border border-white/10 p-3 rounded-xl flex justify-between items-center">
+                            <span class="font-bold text-white text-sm">${s.title}</span>
+                            <button onclick='app.quickAdd(${JSON.stringify(s)})' class="text-xs font-bold bg-violet-600 px-3 py-1.5 rounded-lg">ADD</button>
+                        </div>
+                    `).join('');
+                    document.getElementById('ai-input-step').classList.add('hidden');
+                    container.classList.remove('hidden');
+                } catch(e) {
+                    console.error(e);
+                    helpers.toast("AI Error. Try again.", "error");
+                } finally {
+                    btn.innerText = "Generate Plan";
+                    btn.disabled = false;
+                }
+            },
+            quickAdd: async (habitData) => {
+                if (!authReady || !store.user) return helpers.toast("Authentication required.", "error");
+                const id = crypto.randomUUID();
+                await setDoc(doc(db, 'artifacts', appId, 'users', store.user.uid, 'habits', id), { ...habitData, color: 'violet', createdAt: new Date().toISOString() });
+                helpers.toast("Habit Added!");
+                app.closeModal('ai-modal');
+            }
+        };
+
+        setInterval(() => {
+            if (!store.habits.length || Notification.permission !== "granted") return;
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const timeString = `${hours}:${minutes}`;
+            const minuteKey = `${now.getDate()}-${timeString}`;
+            if(store.notifiedMinutes.has(minuteKey)) return;
+            store.habits.forEach(h => {
+                if (h.reminderTime === timeString) {
+                    new Notification(`Time for ${h.title}!`, {
+                        body: `Don't break your streak!`,
+                        icon: 'https://cdn-icons-png.flaticon.com/512/3176/3176366.png'
+                    });
+                    store.notifiedMinutes.add(minuteKey);
+                }
+            });
+            if(store.notifiedMinutes.size > 5) store.notifiedMinutes.clear();
+        }, 20000);
+
+        const startApp = async () => {
+            render.hideLoading(); 
+            onAuthStateChanged(auth, (user) => {
+                if(user) {
+                    store.user = user;
+                    authReady = true;
+                    document.getElementById('auth-modal').classList.add('hidden');
+                    render.init();
+                    const habitsRef = collection(db, 'artifacts', appId, 'users', user.uid, 'habits');
+                    onSnapshot(query(habitsRef), (snap) => {
+                        store.habits = snap.docs.map(d => ({id: d.id, ...d.data()})).sort((a,b) => a.createdAt.localeCompare(b.createdAt));
+                        if(store.viewingHabitId) render.calendar(store.viewingHabitId);
+                        render.dashboard();
+                    }, (err) => { console.error("Habit sync error:", err); });
+                    onSnapshot(doc(db, 'artifacts', appId, 'users', user.uid, 'settings', 'config'), (snap) => {
+                        if(snap.exists()) store.settings = snap.data();
+                    });
+                    onSnapshot(doc(db, 'artifacts', appId, 'users', user.uid, 'stats', 'xp'), (snap) => {
+                        if(snap.exists()) {
+                            store.xp = snap.data().val;
+                            store.level = Math.floor(store.xp / 100) + 1;
+                            render.dashboard();
+                        }
+                    });
+                } else {
+                    store.user = null;
+                    authReady = false;
+                    document.getElementById('auth-modal').classList.remove('hidden');
+                }
+            });
+            try {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                }
+            } catch (error) { console.error("Auth Token Failed:", error); }
+        };
+        startApp();
+    </script>
+</body>
+</html>
