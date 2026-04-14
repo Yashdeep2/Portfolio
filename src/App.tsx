@@ -6,7 +6,7 @@ interface Experience {
   title: string;
   company: string;
   description: string;
-  link: string;
+  link?: string;
   images: string[];
 }
 
@@ -688,7 +688,7 @@ export function App() {
       company: "Avaada Group",
       description:
         "Developed an automated HR analytics system using Excel VBA and Power BI, reducing manual reporting effort by over 85% and enabling real-time workforce insights. Designed end-to-end data pipelines for data collection, processing, and visualization to support faster decision-making.",
-      link: "#",
+
       images: ["HR-2.0-1.png", "HR-2.0-2.png", "HR-2.0-3.png"],
     },
     {
@@ -706,7 +706,7 @@ export function App() {
       company: "Enterprise Automation",
       description:
         "Built a VBA-based automation system to extract and process SAP data, eliminating repetitive manual workflows and improving reporting efficiency. Enabled structured data handling for faster and more reliable business analysis.",
-      link: "#",
+
       images: ["SAP-aut-2.jpg", "SAP-aut-1.jpg", "SAP-aut-3.jpg"],
     },
 
@@ -731,7 +731,7 @@ export function App() {
       company: "Data Engineering Project",
       description:
         "Designed automated data pipelines for enterprise workflows, enabling seamless batch processing and structured data movement across systems. Improved data consistency and reduced manual intervention in business operations.",
-      link: "#",
+
       images: ["SCript-1.jpg", "Workflow.jpg"],
     },
     {
@@ -740,7 +740,7 @@ export function App() {
       company: "Manufacturing Process Innovation",
       description:
         "Developed an industrial monitoring system using sensors to detect conveyor belt slippage & failures and trigger automated alerts. Improved operational safety and reduced equipment downtime in manufacturing processes.",
-      link: "#",
+
       images: ["Belt.jpg"],
     },
     {
@@ -749,7 +749,7 @@ export function App() {
       company: "IoT & AI Research Project",
       description:
         "Built an IoT-based healthcare monitoring system integrating multiple sensors and machine learning models for early disease prediction. Enabled real-time patient monitoring and cloud-based reporting through an accessible interface.",
-      link: "#",
+
       images: ["Medibot-1.jpg", "Medibot-2.jpg", "MEDI-BOT-4.jpg"],
     },
     {
@@ -758,7 +758,7 @@ export function App() {
       company: "Workflow Automation",
       description:
         "Built a real-time system that automatically detects and processes newly created PDF files across a local network, enabling automated naming, tracking and file management workflows.",
-      link: "#",
+
       images: ["File-monitoring.jpg"],
     },
     {
@@ -767,7 +767,7 @@ export function App() {
       company: "Software Automation Projects",
       description:
         "Developed automation tools using Python for image processing, data formatting, and workflow optimization. Streamlined repetitive tasks and improved efficiency across multiple use cases.",
-      link: "#",
+
       images: ["Python-1.jpg", "Pyhton-3.jpg"],
     },
   ];
@@ -1439,14 +1439,16 @@ export function App() {
                 <div className="h-px w-full bg-gradient-to-r from-transparent via-[#5C7C89]/30 to-transparent" />
 
                 {/* Button */}
-                <a
-                  href={selectedExp?.link}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="w-fit flex items-center gap-3 px-6 py-3 bg-[#5C7C89] text-white rounded-xl text-xs font-black uppercase tracking-widest hover:bg-[#5C7C89]/80 hover:-translate-y-1 transition-all shadow-lg active:scale-95"
-                >
-                  Project Link <ExternalLink size={14} />
-                </a>
+                {selectedExp?.link?.trim() && (
+                  <a
+                    href={selectedExp.link}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="w-fit flex items-center gap-3 px-6 py-3 bg-[#5C7C89] text-white rounded-xl text-xs font-black uppercase tracking-widest hover:bg-[#5C7C89]/80 hover:-translate-y-1 transition-all shadow-lg active:scale-95"
+                  >
+                    Project Link <ExternalLink size={14} />
+                  </a>
+                )}
               </div>
             </div>
           </div>
