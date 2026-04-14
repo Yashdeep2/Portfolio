@@ -689,11 +689,7 @@ export function App() {
       description:
         "Developed an automated HR analytics system using Excel VBA and Power BI, reducing manual reporting effort by over 85% and enabling real-time workforce insights. Designed end-to-end data pipelines for data collection, processing, and visualization to support faster decision-making.",
       link: "#",
-      images: [
-        "public/HR 2.0 1.png",
-        "public/HR 2.0 2.png",
-        "public/HR 2.0 3.png",
-      ],
+      images: ["HR-2.0-1.png", "HR-2.0-2.png", "HR-2.0-3.png"],
     },
     {
       id: 2,
@@ -702,11 +698,7 @@ export function App() {
       description:
         "Built a real-time web dashboard using Firebase to capture and process hourly production data from authenticated users. Implemented role-based Gmail access control and dynamic data visualization, replacing manual reporting workflows and improving operational efficiency and data reliability.",
       link: "https://yashdeep2.github.io/Stringer1/",
-      images: [
-        "public/Stringer 1.png",
-        "public/Stringer 2.png",
-        "public/Stringer 3.png",
-      ],
+      images: ["Stringer-1.png", "Stringer-2.png", "Stringer-3.png"],
     },
     {
       id: 3,
@@ -715,11 +707,7 @@ export function App() {
       description:
         "Built a VBA-based automation system to extract and process SAP data, eliminating repetitive manual workflows and improving reporting efficiency. Enabled structured data handling for faster and more reliable business analysis.",
       link: "#",
-      images: [
-        "public/SAP aut 2.png",
-        "public/SAP aut 1.png",
-        "public/SAP aut 3.png",
-      ],
+      images: ["SAP-aut-2.jpg", "SAP-aut-1.jpg", "SAP-aut-3.jpg"],
     },
 
     {
@@ -730,11 +718,11 @@ export function App() {
         "Built a Firebase-integrated habit tracking web app with real-time data updates, enabling users to manage habits, visualize progress through calendar-based tracking, and analyze consistency using interactive dashboards. Implemented reward-based engagement logic and habit-wise performance insights to enhance user retention and behavioral consistency.",
       link: "https://yashdeep2.github.io/Health/",
       images: [
-        "public/Habit 1n.png",
-        "public/Habit 2.png",
-        "public/Habit 3.png",
-        "public/Habit 4.png",
-        "public/Habit 5.png",
+        "Habit-1n.png",
+        "Habit-2.png",
+        "Habit-3.png",
+        "Habit-4.png",
+        "Habit-5.png",
       ],
     },
     {
@@ -744,7 +732,7 @@ export function App() {
       description:
         "Designed automated data pipelines for enterprise workflows, enabling seamless batch processing and structured data movement across systems. Improved data consistency and reduced manual intervention in business operations.",
       link: "#",
-      images: ["public/SCript 1.png", "public/Workflow.png"],
+      images: ["SCript-1.jpg", "Workflow.jpg"],
     },
     {
       id: 6,
@@ -753,7 +741,7 @@ export function App() {
       description:
         "Developed an industrial monitoring system using sensors to detect conveyor belt slippage & failures and trigger automated alerts. Improved operational safety and reduced equipment downtime in manufacturing processes.",
       link: "#",
-      images: ["public/Belt.png"],
+      images: ["Belt.jpg"],
     },
     {
       id: 7,
@@ -762,11 +750,7 @@ export function App() {
       description:
         "Built an IoT-based healthcare monitoring system integrating multiple sensors and machine learning models for early disease prediction. Enabled real-time patient monitoring and cloud-based reporting through an accessible interface.",
       link: "#",
-      images: [
-        "public/Medibot 1.png",
-        "public/Medibot 2.png",
-        "public/MEDI BOT 4.png",
-      ],
+      images: ["Medibot-1.jpg", "Medibot-2.jpg", "MEDI-BOT-4.jpg"],
     },
     {
       id: 8,
@@ -775,7 +759,7 @@ export function App() {
       description:
         "Built a real-time system that automatically detects and processes newly created PDF files across a local network, enabling automated naming, tracking and file management workflows.",
       link: "#",
-      images: ["public/File monitoring.png"],
+      images: ["File-monitoring.jpg"],
     },
     {
       id: 9,
@@ -784,7 +768,7 @@ export function App() {
       description:
         "Developed automation tools using Python for image processing, data formatting, and workflow optimization. Streamlined repetitive tasks and improved efficiency across multiple use cases.",
       link: "#",
-      images: ["public/Python 1.png", "public/Pyhton 3.png"],
+      images: ["Python-1.jpg", "Pyhton-3.jpg"],
     },
   ];
 
@@ -799,7 +783,7 @@ export function App() {
       description:
         "Designed control architectures for Line-of-Sight stabilization systems, improving tracking precision and disturbance rejection in dynamic environments. Focused on real-time feedback systems and high-accuracy targeting applications.",
       focus: "Control Systems | Embedded Systems | Defense Technology",
-      images: ["public/LOS 1.png", "public/LOS 2.png", "public/LOS $.png"],
+      images: ["LOS-1.jpg", "LOS-2.jpg", "LOS-$.jpg"],
     },
     {
       id: 2,
@@ -812,7 +796,7 @@ export function App() {
       focus: "Renewable Energy | Solar PV Systems | Power Optimization",
       images: [
         "https://images.unsplash.com/photo-1509391366360-2e959784a276?w=1000&h=560&fit=crop",
-        "public/SOLAR PV 1.png",
+        "SOLAR-PV-1.jpg",
       ],
     },
     {
@@ -824,11 +808,7 @@ export function App() {
       description:
         "Designed and developed 'DOBO', an intelligent medical assistance bot integrating automated response logic and embedded control mechanisms to provide preliminary healthcare support. The system enhances accessibility to basic medical guidance through structured interaction and real-time query handling.",
       focus: "Robotics | Healthcare Automation | Intelligent Systems",
-      images: [
-        "public/Medibot 1.png",
-        "public/Medibot 2.png",
-        "public/MEDI BOT 4.png",
-      ],
+      images: ["Medibot-1.jpg", "Medibot-2.jpg", "MEDI-BOT-4.jpg"],
     },
     {
       id: 4,
@@ -840,7 +820,7 @@ export function App() {
         "Developed and evaluated a piezoelectric energy harvesting system capable of generating electrical power from human footsteps and vehicular vibrations. Proposed a scalable smart-floor architecture for micro-energy generation in high-footfall environments and sustainable infrastructure applications.",
       focus:
         "Energy Harvesting | Piezoelectric Systems | Sustainable Engineering",
-      images: ["public/TILES 2.png"],
+      images: ["TILES-2.jpg"],
     },
     {
       id: 5,
@@ -853,9 +833,9 @@ export function App() {
         "Proposed a novel cryptographic key generation algorithm utilizing Armstrong number logic combined with RGB encoding techniques to strengthen data encryption. The approach enhances key unpredictability while maintaining computational efficiency for secure digital communication systems.",
       focus: "Cryptography | Data Security | Secure Communication Systems",
       images: [
-        "public/Crypto image 1.png",
-        "public/crypto image 2.png",
-        "public/Cryptographic graph.png",
+        "Crypto-image-1.png",
+        "crypto-image-2.png",
+        "Cryptographic-graph.png",
       ],
     },
     {
@@ -865,12 +845,7 @@ export function App() {
       description:
         "Designed an energy optimization framework for electric vehicles to enhance power utilization efficiency and extend operational range. Focused on intelligent load management and energy conservation mechanisms within EV subsystems.",
       focus: "Electric Vehicles | Energy Optimization | Smart Power Management",
-      images: [
-        "public/EV 1.png",
-        "public/EV 2.png",
-        "public/EV 3.png",
-        "public/EV 4.png",
-      ],
+      images: ["EV-1.jpg", "EV-2.jpg", "EV-3.jpg", "EV-4.jpg"],
     },
     {
       id: 7,
@@ -880,7 +855,7 @@ export function App() {
       description:
         "Developed a sustainable energy harvesting method using piezoelectric tiles to capture mechanical stress from footsteps and vehicle motion. Proposed scalable infrastructure integration for smart cities and decentralized micro-power generation.",
       focus: "Sustainable Infrastructure | Energy Harvesting | Smart Cities",
-      images: ["public/TILES 2.png"],
+      images: ["TILES-2.jpg"],
     },
   ];
 
@@ -890,7 +865,7 @@ export function App() {
       title: "Telecommunication Internship",
       issuer: "Power Grid",
       type: "Internship",
-      logo: "public/UPPCL.png",
+      logo: "UPPCL.png",
       description:
         "Exposure to power transmission networks, telecom infrastructure, and real-time grid communication systems.",
     },
@@ -899,7 +874,7 @@ export function App() {
       title: "Front-End Web Development",
       issuer: "Buzzintely",
       type: "Internship",
-      logo: "public/Buzzintely.png",
+      logo: "Buzzintely.png",
       description:
         "Built responsive UI components with focus on user experience, layout structuring, and frontend logic.",
     },
@@ -917,7 +892,7 @@ export function App() {
       title: "Six Sigma Yellow Belt",
       issuer: "Six Sigma",
       type: "Quality",
-      logo: "public/six-sigma.png",
+      logo: "six-sigma.png",
       description:
         "Applied process optimization techniques for efficiency improvement and defect reduction.",
     },
@@ -926,7 +901,7 @@ export function App() {
       title: "IMS Internal Auditor",
       issuer: "ISO Standards",
       type: "Compliance",
-      logo: "public/iso-symbol.png",
+      logo: "iso-symbol.png",
       description:
         "Auditing ISO systems for compliance, process improvement, and operational standardization.",
     },
@@ -935,7 +910,7 @@ export function App() {
       title: "Certified First Aider",
       issuer: "Red Cross",
       type: "Safety",
-      logo: "public/red-cross.png",
+      logo: "red-cross.png",
       description:
         "Trained in emergency response, workplace safety, and critical situation handling.",
     },
@@ -944,7 +919,7 @@ export function App() {
       title: "Enhancing Soft Skills",
       issuer: "NPTEL",
       type: "Certification",
-      logo: "public/idkr1SGAoi_logos.jpeg",
+      logo: "idkr1SGAoi_logos.jpeg",
       description:
         "Improved communication, teamwork, and professional interaction skills.",
     },
@@ -953,7 +928,7 @@ export function App() {
       title: "Introduction to IoT",
       issuer: "NPTEL",
       type: "Certification",
-      logo: "public/idkr1SGAoi_logos.jpeg",
+      logo: "idkr1SGAoi_logos.jpeg",
       description:
         "Fundamentals of IoT architecture, sensor networks, and real-time data systems.",
     },
@@ -962,7 +937,7 @@ export function App() {
       title: "Conscious Engineering",
       issuer: "VE Cell",
       type: "Workshop",
-      logo: "public/VE cell.jfif",
+      logo: "VE-cell.jfif",
       description:
         "Focus on sustainable engineering, ethical design, and real-world problem solving.",
     },
@@ -1074,12 +1049,12 @@ export function App() {
       {/* 2. BACKGROUND IMAGES (Preloaded & Crossfaded) */}
       <div className="fixed inset-0 pointer-events-none z-0 bg-[#011425]">
         <img
-          src="public/shubham-dhage-rzqjQjGvOBQ-unsplash (2).jpg"
+          src="shubham-dhage-rzqjQjGvOBQ-unsplash-(2).jpg"
           alt="Light Background"
           className="absolute inset-0 w-full h-full object-cover"
         />
         <img
-          src="public/sebastian-svenson-d2w-_1LJioQ-unsplash.jpg"
+          src="sebastian-svenson-d2w-_1LJioQ-unsplash.jpg"
           alt="Dark Background"
           className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ease-in-out ${
             dark ? "opacity-100" : "opacity-0"
@@ -1176,7 +1151,7 @@ export function App() {
               <div className="grid md:grid-cols-5 min-h-[520px] relative z-20">
                 <div className="md:col-span-2 relative group overflow-hidden bg-slate-900">
                   <img
-                    src="public/Hero.png"
+                    src="Hero.jpg"
                     alt="Profile"
                     className="w-full h-full object-cover grayscale-[0.1] group-hover:grayscale-0 transition-all duration-1000 group-hover:scale-105"
                   />
