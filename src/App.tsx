@@ -1,5 +1,26 @@
 import { useState, useEffect } from "react";
 import { Sun, Moon, ExternalLink, Mail, Github, Linkedin } from "lucide-react";
+const isMobile = window.innerWidth < 768;
+const MobileExperienceCard = ({ exp, onClick }: any) => {
+  return (
+    <div
+      onClick={() => onClick(exp)}
+      className="flex gap-3 p-3 rounded-xl bg-white/10 border border-white/10"
+    >
+      <img
+        loading="lazy"
+        decoding="async"
+        src={exp.images[0]}
+        className="w-20 h-20 object-cover rounded-lg"
+      />
+
+      <div className="flex flex-col justify-center">
+        <h3 className="text-sm font-semibold text-white">{exp.title}</h3>
+        <p className="text-xs text-gray-400 line-clamp-2">{exp.description}</p>
+      </div>
+    </div>
+  );
+};
 
 interface Experience {
   id: number;
@@ -64,8 +85,10 @@ const GlobalStyles = () => (
     
     /* Hero */
     .text-hero {
-      font-size: clamp(44px, 4vw, 30px);
+      font-size: clamp(2.4rem, 8vw, 5rem);
       font-weight: 800;
+      line-height: 0.95;
+      letter-spacing: -0.04em;
     }
     
     /* Body */
@@ -136,6 +159,36 @@ const GlobalStyles = () => (
        color: #5c7c89;
      }
 
+     @media (max-width: 768px) {
+
+      .premium-card,
+      .hero-card,
+      .section-reveal,
+      .fade-in-up {
+        transform: none !important;
+        animation: none !important;
+        transition: opacity 0.2s ease !important;
+        will-change: auto !important;
+      }
+    
+      .premium-card:hover {
+        transform: none !important;
+        box-shadow: none !important;
+      }
+    
+      .card-glow-layer,
+      .card-gloss,
+      .ambient-orb {
+        display: none !important;
+      }
+    
+      .backdrop-blur-xl,
+      .backdrop-blur-2xl,
+      .backdrop-blur-3xl {
+        backdrop-filter: blur(8px) !important;
+        -webkit-backdrop-filter: blur(8px) !important;
+      }
+    }
      .text-primary,
 .text-muted,
 .text-accent {
@@ -317,6 +370,94 @@ const GlobalStyles = () => (
         opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1),
         transform 1.2s cubic-bezier(0.16, 1, 0.3, 1),
         filter 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @media (max-width: 768px) {
+
+      /* Disable heavy transforms */
+    
+      .premium-card,
+      .hero-card,
+      .section-reveal,
+      .fade-in-up,
+      .hero-track-smooth,
+      .hero-idle-float {
+        animation: none !important;
+    
+        transition:
+          opacity 0.25s ease,
+          background-color 0.25s ease,
+          border-color 0.25s ease !important;
+    
+        transform: none !important;
+        will-change: auto !important;
+      }
+    
+      .premium-card:hover {
+        transform: none !important;
+        box-shadow: none !important;
+      }
+    
+      /* Remove GPU heavy glow effects */
+    
+      .card-glow-layer,
+      .card-gloss,
+      .ambient-orb {
+        display: none !important;
+      }
+    
+      /* Reduce blur */
+    
+      .backdrop-blur-xl,
+      .backdrop-blur-2xl,
+      .backdrop-blur-3xl {
+        backdrop-filter: blur(8px) !important;
+        -webkit-backdrop-filter: blur(8px) !important;
+      }
+    
+      /* Reduce shadows */
+    
+      .premium-card {
+        box-shadow:
+          0 4px 12px rgba(0,0,0,0.08) !important;
+    
+        border-radius: 1.5rem !important;
+      }
+    
+      /* Better typography */
+    
+      .text-heading {
+        font-size: 1.8rem !important;
+        line-height: 1.1 !important;
+      }
+    
+      .text-title {
+        font-size: 0.95rem !important;
+        line-height: 1.3 !important;
+      }
+    
+      .text-body {
+        font-size: 0.82rem !important;
+        line-height: 1.6 !important;
+      }
+    
+      .text-label {
+        font-size: 0.58rem !important;
+      }
+    
+      /* Hero adjustments */
+    
+      #home {
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
+      }
+    
+      /* Smaller section containers */
+    
+      .mobile-container {
+        border-radius: 1.5rem !important;
+        padding: 1rem !important;
+      }
+    
     }
     
     .section-reveal.visible {
@@ -601,7 +742,19 @@ export function App() {
     "education",
     "contact",
   ];
+  const [isMobile, setIsMobile] = useState(false);
 
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+
+    checkMobile();
+
+    window.addEventListener("resize", checkMobile);
+
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
   const gallery = useGallery();
 
   // 1. Independent Loading Timer
@@ -635,7 +788,7 @@ export function App() {
       },
       {
         root: null,
-        threshold: 0.25, // Works flawlessly with viewport root
+        threshold: isMobile ? 0.05 : 0.25, // Works flawlessly with viewport root
       }
     );
 
@@ -750,7 +903,7 @@ export function App() {
       description:
         "Built an IoT-based healthcare monitoring system integrating multiple sensors and machine learning models for early disease prediction. Enabled real-time patient monitoring and cloud-based reporting through an accessible interface.",
 
-      images: ["Medibot-1.jpg", "Medibot-2.jpg", "MEDI-BOT-4.jpg"],
+      images: ["Medibot-1.jpg", "Medibot-2.jpg", "MED-BOT-4.jpg"],
     },
     {
       id: 8,
@@ -794,10 +947,7 @@ export function App() {
       description:
         "Conducted an experimental performance evaluation of a rooftop Solar Photovoltaic (PV) system under varying environmental and load conditions. Analyzed output efficiency, temperature effects, and system losses to optimize power generation and enhance renewable energy utilization in urban installations.",
       focus: "Renewable Energy | Solar PV Systems | Power Optimization",
-      images: [
-        "https://images.unsplash.com/photo-1509391366360-2e959784a276?w=1000&h=560&fit=crop",
-        "SOLAR-PV-1.jpg",
-      ],
+      images: ["rooftop.png", "SOLAR-PV-1.jpg"],
     },
     {
       id: 3,
@@ -883,7 +1033,7 @@ export function App() {
       title: "Build IoT Things",
       issuer: "Udemy",
       type: "Certification",
-      logo: "https://cdn.worldvectorlogo.com/logos/udemy-2.svg",
+      logo: "Udemy.png",
       description:
         "Hands-on IoT systems with sensor integration, data flow, and connected device applications.",
     },
@@ -943,6 +1093,15 @@ export function App() {
     },
     {
       id: 10,
+      title: "Avaada Young Achiever Award",
+      issuer: "Avaada",
+      type: "Award",
+      logo: "Award.png",
+      description:
+        "Recognized for performing outstandingly with the organization",
+    },
+    {
+      id: 11,
       title: "Best Kaizen Award",
       issuer: "Avaada",
       type: "Award",
@@ -951,11 +1110,11 @@ export function App() {
         "Recognized for implementing impactful process improvements and efficiency gains.",
     },
     {
-      id: 11,
+      id: 12,
       title: "Employee of the Month",
       issuer: "Avaada",
       type: "Award",
-      logo: "https://cdn-icons-png.flaticon.com/512/190/190411.png",
+      logo: "EOM.png",
       description:
         "Awarded for high performance, ownership, and strong problem-solving contribution.",
     },
@@ -989,6 +1148,7 @@ export function App() {
       items: [
         "Problem Solving & System Design Thinking",
         "AI-Assisted Coding Workflows",
+        "Agend deployment on AWS bedrock",
         "Rapid Prototyping with AI Tools",
         "Prompt Engineering for Development",
         "AI-Guided Data Processing",
@@ -1028,7 +1188,7 @@ export function App() {
   const getSectionCardClasses = (sectionId: string) => {
     // Reveal instantly checks both flags so cards animate up precisely when loading is done
     const isVisible = loadingDone && visible[sectionId];
-    return `w-full max-w-[95%] xl:max-w-[85rem] mx-auto transform-gpu transition-colors duration-1000 ease-out z-10 relative ${
+    return `w-full max-w-full md:max-w-[95%] xl:max-w-[85rem] mx-auto transform-gpu transition-colors duration-1000 ease-out z-10 relative ${
       isVisible
         ? "opacity-100 translate-y-0 scale-100"
         : "opacity-0 translate-y-24 scale-95"
@@ -1049,14 +1209,18 @@ export function App() {
       {/* 2. BACKGROUND IMAGES (Preloaded & Crossfaded) */}
       <div className="fixed inset-0 pointer-events-none z-0 bg-[#011425]">
         <img
+          loading="lazy"
+          decoding="async"
           src="shubham-dhage-rzqjQjGvOBQ-unsplash-(2).jpg"
           alt="Light Background"
-          className="absolute inset-0 w-full h-full object-cover"
+          className="absolute inset-0 w-full h-full object-cover object-center"
         />
         <img
+          loading="lazy"
+          decoding="async"
           src="sebastian-svenson-d2w-_1LJioQ-unsplash.jpg"
           alt="Dark Background"
-          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ease-in-out ${
+          className={`absolute inset-0 w-full h-full object-cover object-center transition-opacity duration-300 ease-in-out ${
             dark ? "opacity-100" : "opacity-0"
           }`}
         />
@@ -1111,7 +1275,47 @@ export function App() {
           </div>
         </div>
       </nav>
-
+      <div className="md:hidden fixed bottom-4 left-1/2 -translate-x-1/2 z-[100]">
+        <div
+          className="
+    flex
+    items-center
+    gap-2
+    px-4
+    py-3
+    rounded-full
+    backdrop-blur-xl
+    bg-black/40
+    border
+    border-white/10
+  "
+        >
+          {navItems.slice(0, 5).map((item) => (
+            <button
+              key={item}
+              onClick={() =>
+                document
+                  .getElementById(item)
+                  ?.scrollIntoView({ behavior: "smooth" })
+              }
+              className={`
+          text-[10px]
+          uppercase
+          tracking-wider
+          px-2
+          py-1
+          rounded-full
+          transition-all
+          ${
+            activeSection === item ? "bg-[#5C7C89] text-white" : "text-white/60"
+          }
+        `}
+            >
+              {item}
+            </button>
+          ))}
+        </div>
+      </div>
       {/* ── Hero / Business Card ────────────────────────────────────────── */}
       <section
         id="home"
@@ -1122,8 +1326,8 @@ export function App() {
           className={`w-full max-w-4xl z-10 section-reveal ${
             visible["home"] ? "visible" : ""
           }`}
-          onMouseMove={handleHeroMove}
-          onMouseLeave={resetHero}
+          onMouseMove={!isMobile ? handleHeroMove : undefined}
+          onMouseLeave={!isMobile ? resetHero : undefined}
         >
           <div
             className="w-full h-full transition-transform duration-200 ease-out"
@@ -1137,7 +1341,7 @@ export function App() {
             }}
           >
             <div
-              className={`relative backdrop-blur-2xl glass ${surface} rounded-[2.5rem] overflow-hidden shadow-2xl transition-all duration-300 ${
+              className={`relative backdrop-blur-2xl glass ${surface} rounded-[1.5rem] md:rounded-[1.5rem] md:rounded-[1.8rem] md:rounded-[2.5rem] overflow-hidden shadow-2xl transition-all duration-300 ${
                 isHeroHovered ? "shadow-black/50 border-white/20" : ""
               }`}
             >
@@ -1148,17 +1352,37 @@ export function App() {
                 }}
               />
 
-              <div className="grid md:grid-cols-5 min-h-[520px] relative z-20">
-                <div className="md:col-span-2 relative group overflow-hidden bg-slate-900">
+              <div className="flex flex-col md:grid md:grid-cols-5 relative z-20">
+                <div
+                  className="h-[300px]
+sm:h-[360px]
+md:h-auto
+md:col-span-2
+relative
+group
+overflow-hidden
+bg-slate-900"
+                >
                   <img
+                    loading="lazy"
+                    decoding="async"
                     src="Hero.jpg"
                     alt="Profile"
-                    className="w-full h-full object-cover grayscale-[0.1] group-hover:grayscale-0 transition-all duration-1000 group-hover:scale-105"
+                    className="w-full h-full object-cover object-center grayscale-[0.1] group-hover:grayscale-0 transition-all duration-500 md:duration-1000 group-hover:scale-105"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-[#0f1623]/80 via-transparent to-transparent" />
                 </div>
 
-                <div className="md:col-span-3 p-10 md:p-12 flex flex-col justify-center relative">
+                <div
+                  className="md:col-span-3
+p-6
+sm:p-8
+md:p-12
+flex
+flex-col
+justify-center
+relative"
+                >
                   <div className="space-y-6">
                     <div className="flex items-center gap-3">
                       <div className="h-px w-8 bg-[#5C7C89]/50" />
@@ -1195,7 +1419,7 @@ export function App() {
                             .getElementById("contact")
                             ?.scrollIntoView({ behavior: "smooth" })
                         }
-                        className={`px-8 py-4 text-xs font-black tracking-widest rounded-full border transition-all duration-300 uppercase hover:scale-105 active:scale-95 ${
+                        className={`px-5 md:px-8 py-3 md:py-4 text-xs font-black tracking-widest rounded-full border transition-all duration-300 uppercase hover:scale-105 active:scale-95 ${
                           dark
                             ? "bg-[#5C7C89]/80 text-[#F8FAFC] border-[#5C7C89]/30 hover:bg-[#5C7C89] hover:shadow-[0_0_30px_rgba(92,124,137,0.4)]" // Dark mode: Bluish-grey with glow
                             : "bg-[#64748B] text-[#F8FAFC] border-[#64748B]/30 hover:bg-[#64748B] hover:shadow-[0_0_30px_rgba(100,116,139,0.4)]" // Light mode: Solid cool grey, darkens on hover
@@ -1209,7 +1433,7 @@ export function App() {
                             .getElementById("experience")
                             ?.scrollIntoView({ behavior: "smooth" })
                         }
-                        className={`px-8 py-4 text-xs font-black tracking-widest rounded-full border transition-all duration-300 uppercase hover:scale-101 ${
+                        className={`px-5 md:px-8 py-3 md:py-4 text-xs font-black tracking-widest rounded-full border transition-all duration-300 uppercase hover:scale-101 ${
                           dark
                             ? "bg-transparent text-[#F8FAFC] border-[#5C7C89]/50 hover:bg-[#F8FAFC] hover:text-[#011425]" // Dark mode hover
                             : "bg-transparent text-[#1E293B] border-[#64748B]/50 hover:bg-[#1E293B] hover:text-[#F8FAFC]" // Light mode hover
@@ -1254,11 +1478,11 @@ export function App() {
       {/* ── Work Experience ─────────────────────────────────────────────── */}
       <section
         id="experience"
-        className="relative min-h-screen w-full pt-24 pb-12 px-4 flex items-start"
+        className="relative min-h-[auto] md:min-h-screen w-full pt-24 pb-12 px-4 flex items-start"
       >
         <div className={getSectionCardClasses("experience")}>
           <div
-            className={`rounded-[2.5rem] p-6 md:p-8 border shadow-2xl relative w-full max-h-none ${surfaceSolid}`}
+            className={`rounded-[1.5rem] md:rounded-[1.5rem] md:rounded-[2.5rem] p-4 md:p-8 border shadow-2xl relative w-full max-h-none ${surfaceSolid}`}
           >
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1/2 h-px bg-gradient-to-r from-transparent via-[#5C7C89]/50 to-transparent" />
 
@@ -1269,7 +1493,7 @@ export function App() {
               muted={muted}
             />
 
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4">
               {experiences.map((exp: Experience, i: number) => {
                 const technicalFocus = exp.title
                   .split(" ")
@@ -1281,18 +1505,28 @@ export function App() {
                     key={exp.id}
                     onClick={() => setSelectedExp(exp)}
                     style={{ transitionDelay: `${i * 10}ms` }}
-                    className={`group premium-card relative flex flex-col rounded-[2.5rem] border ${cardBg} cursor-pointer p-2 md:p-2 transition-all duration-500 ease-out hover:-translate-y-4 hover:scale-[1.02] hover:border-[#5C7C89]/50 hover:shadow-2xl ${
+                    className={`group premium-card relative flex flex-col rounded-[1.5rem] md:rounded-[1.5rem] md:rounded-[2.5rem] border ${cardBg} cursor-pointer p-2 md:p-2 transition-all duration-500 ease-out hover:-translate-y-4 hover:scale-[1.02] hover:border-[#5C7C89]/50 hover:shadow-2xl ${
                       visible["experience"]
                         ? "opacity-100 translate-y-0"
                         : "opacity-0 translate-y-10"
                     }`}
                   >
                     <div className="card-glow-layer" />
-                    <div className="h-36 overflow-hidden relative rounded-[1.8rem] mb-4">
+                    <div
+                      className="h-52
+sm:h-44
+overflow-hidden
+relative
+rounded-[1.2rem]
+md:rounded-[1.8rem]
+mb-4"
+                    >
                       <img
+                        loading="lazy"
+                        decoding="async"
                         src={exp.images[0]}
                         alt={exp.title}
-                        className="w-full h-full object-cover grayscale-[0.2] transition-all duration-1000 group-hover:grayscale-0 group-hover:scale-110"
+                        className="w-full h-full object-cover object-center grayscale-[0.2] transition-all duration-500 md:duration-1000 group-hover:grayscale-0 md:group-hover:scale-110"
                       />
                       <div
                         className={`absolute inset-0 bg-gradient-to-t ${
@@ -1306,7 +1540,7 @@ export function App() {
                       </div>
                     </div>
 
-                    <div className="px-4 pb-6 flex flex-col flex-grow justify-between relative z-10">
+                    <div className="px-3 md:px-4 pb-4 md:pb-6 flex flex-col flex-grow justify-between relative z-10">
                       <div>
                         <div className="flex items-center gap-2 mb-3">
                           <span className="w-1.5 h-1.5 rounded-full bg-[#5C7C89] animate-pulse" />
@@ -1362,7 +1596,7 @@ export function App() {
               dark
                 ? "bg-[#0f1623]/70 backdrop-blur-3xl border-white/10 text-white"
                 : "bg-white/70 backdrop-blur-3xl border-white text-slate-900"
-            } border rounded-[2.5rem] overflow-hidden flex flex-col shadow-2xl modal-animate`}
+            } border rounded-[1.5rem] md:rounded-[1.5rem] md:rounded-[2.5rem] overflow-hidden flex flex-col shadow-2xl modal-animate`}
           >
             {/* Close Button */}
             <button
@@ -1372,22 +1606,30 @@ export function App() {
               ✕
             </button>
 
-            <div className="flex flex-col lg:flex-row h-full overflow-y-auto">
+            <div
+              className="flex
+flex-col
+lg:flex-row
+h-full
+overflow-y-auto"
+            >
               {/* LEFT SIDE - IMAGES */}
               <div
-                className={`lg:w-3/5 p-6 md:p-10 ${
+                className={`w-full lg:w-3/5 p-6 md:p-10 ${
                   dark ? "bg-black/20" : "bg-white/40"
                 } flex flex-col gap-6`}
               >
                 {/* Main Image */}
-                <div className="aspect-video rounded-[2rem] overflow-hidden border dark:border-white/10 border-slate-200 shadow-2xl bg-black">
+                <div className="aspect-[4/3] md:aspect-video rounded-[2rem] overflow-hidden border dark:border-white/10 border-slate-200 shadow-2xl bg-black">
                   <img
+                    loading="lazy"
+                    decoding="async"
                     src={
                       selectedExp?.images[
                         gallery.get(`modal-${selectedExp?.id}`)
                       ]
                     }
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover object-center"
                   />
                 </div>
 
@@ -1405,14 +1647,19 @@ export function App() {
                           : "border-transparent opacity-70 hover:opacity-100"
                       }`}
                     >
-                      <img src={img} className="w-full h-full object-cover" />
+                      <img
+                        loading="lazy"
+                        decoding="async"
+                        src={img}
+                        className="w-full h-full object-cover object-center"
+                      />
                     </div>
                   ))}
                 </div>
               </div>
 
               {/* RIGHT SIDE - CONTENT */}
-              <div className="lg:w-2/5 p-8 md:p-12 flex flex-col gap-6 justify-center relative z-10">
+              <div className="w-full lg:w-2/5 p-8 md:p-12 flex flex-col gap-6 justify-center relative z-10">
                 {/* Company Label */}
                 <div className="flex items-center gap-3">
                   <div className="h-px w-10 bg-[#5C7C89]" />
@@ -1458,11 +1705,11 @@ export function App() {
       {/* ── Research Work ────────────────────────── */}
       <section
         id="research"
-        className="relative min-h-screen w-full pt-24 pb-12 px-4 flex items-start"
+        className="relative min-h-[auto] md:min-h-screen w-full pt-24 pb-12 px-4 flex items-start"
       >
         <div className={getSectionCardClasses("research")}>
           <div
-            className={`rounded-[2.5rem] p-6 md:p-8 border shadow-2xl relative w-full max-h-none ${surfaceSolid}`}
+            className={`rounded-[1.5rem] md:rounded-[1.5rem] md:rounded-[1.5rem] md:rounded-[2.5rem] p-4 md:p-8 border shadow-2xl relative w-full max-h-none ${surfaceSolid}`}
           >
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1/2 h-px bg-gradient-to-r from-transparent via-[#5C7C89]/50 to-transparent" />
 
@@ -1474,7 +1721,7 @@ export function App() {
                 muted={muted}
               />
 
-              <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4">
                 {research.map((res: Research, i: number) => {
                   const mainFocus = res.focus
                     ? res.focus.split("|")[0].trim()
@@ -1485,7 +1732,7 @@ export function App() {
                       key={res.id}
                       onClick={() => setSelectedResearch(res)}
                       style={{ transitionDelay: `${i * 10}ms` }}
-                      className={`group premium-card relative flex flex-col rounded-[2.5rem] border ${cardBg} cursor-pointer p-2 md:p-2 transition-all duration-500 ease-out hover:-translate-y-4 hover:scale-[1.02] hover:border-[#5C7C89]/50 hover:shadow-2xl ${
+                      className={`group premium-card relative flex flex-col rounded-[1.5rem] md:rounded-[1.5rem] md:rounded-[1.5rem] md:rounded-[2.5rem] border ${cardBg} cursor-pointer p-2 md:p-2 transition-all duration-500 ease-out hover:-translate-y-4 hover:scale-[1.02] hover:border-[#5C7C89]/50 hover:shadow-2xl ${
                         visible["research"]
                           ? "opacity-100 translate-y-0"
                           : "opacity-0 translate-y-10"
@@ -1494,11 +1741,21 @@ export function App() {
                       <div className="card-glow-layer" />
 
                       {/* IMAGE */}
-                      <div className="h-36 overflow-hidden relative rounded-[1.8rem] mb-4">
+                      <div
+                        className="h-52
+sm:h-44
+overflow-hidden
+relative
+rounded-[1.2rem]
+md:rounded-[1.8rem]
+mb-4"
+                      >
                         <img
+                          loading="lazy"
+                          decoding="async"
                           src={res.images[0]}
                           alt={res.title}
-                          className="w-full h-full object-cover grayscale-[0.2] transition-all duration-1000 group-hover:grayscale-0 group-hover:scale-110"
+                          className="w-full h-full object-cover object-center grayscale-[0.2] transition-all duration-500 md:duration-1000 group-hover:grayscale-0 md:group-hover:scale-110"
                         />
                         <div
                           className={`absolute inset-0 bg-gradient-to-t ${
@@ -1515,7 +1772,7 @@ export function App() {
                       </div>
 
                       {/* CONTENT */}
-                      <div className="px-4 pb-6 flex flex-col flex-grow justify-between relative z-10">
+                      <div className="px-3 md:px-4 pb-4 md:pb-6 flex flex-col flex-grow justify-between relative z-10">
                         <div>
                           <div className="flex items-center gap-2 mb-3">
                             <span className="w-1.5 h-1.5 rounded-full bg-[#5C7C89] animate-pulse" />
@@ -1576,7 +1833,7 @@ export function App() {
                 dark
                   ? "bg-[#0f1623]/70 backdrop-blur-3xl border-white/10 text-white"
                   : "bg-white/70 backdrop-blur-3xl border-white text-slate-900"
-              } border rounded-[2.5rem] overflow-hidden flex flex-col shadow-2xl modal-animate`}
+              } border rounded-[1.5rem] md:rounded-[1.5rem] md:rounded-[1.5rem] md:rounded-[2.5rem] overflow-hidden flex flex-col shadow-2xl modal-animate`}
             >
               {/* Close */}
               <button
@@ -1589,18 +1846,20 @@ export function App() {
               <div className="flex flex-col lg:flex-row h-full overflow-hidden">
                 {/* LEFT (Images) */}
                 <div
-                  className={`lg:w-3/5 p-6 md:p-10 ${
+                  className={`w-full lg:w-3/5 p-6 md:p-10 ${
                     dark ? "bg-black/20" : "bg-white/40"
                   } flex flex-col gap-6`}
                 >
-                  <div className="aspect-video rounded-[2rem] overflow-hidden border dark:border-white/10 border-slate-200 shadow-2xl bg-black">
+                  <div className="aspect-[4/3] md:aspect-video rounded-[2rem] overflow-hidden border dark:border-white/10 border-slate-200 shadow-2xl bg-black">
                     <img
+                      loading="lazy"
+                      decoding="async"
                       src={
                         selectedResearch?.images[
                           gallery.get(`res-modal-${selectedResearch?.id}`)
                         ]
                       }
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-cover object-center"
                     />
                   </div>
 
@@ -1623,8 +1882,10 @@ export function App() {
                           }`}
                         >
                           <img
+                            loading="lazy"
+                            decoding="async"
                             src={img}
-                            className="w-full h-full object-cover"
+                            className="w-full h-full object-cover object-center"
                           />
                         </div>
                       )
@@ -1633,7 +1894,7 @@ export function App() {
                 </div>
 
                 {/* RIGHT (Content) */}
-                <div className="lg:w-2/5 p-8 md:p-12 flex flex-col gap-6 justify-center relative z-10">
+                <div className="w-full lg:w-2/5 p-8 md:p-12 flex flex-col gap-6 justify-center relative z-10">
                   {/* Meta */}
                   <div className="flex items-center gap-3">
                     <div className="h-px w-10 bg-[#5C7C89]" />
@@ -1704,11 +1965,11 @@ export function App() {
       {/* ── Certifications ─────────────────────────────────────────────── */}
       <section
         id="certifications"
-        className="relative min-h-screen w-full pt-24 pb-12 px-4 flex items-start"
+        className="relative min-h-[auto] md:min-h-screen w-full pt-24 pb-12 px-4 flex items-start"
       >
         <div className={getSectionCardClasses("certifications")}>
           <div
-            className={`rounded-[2.5rem] p-6 md:p-8 border shadow-2xl relative w-full max-h-none ${surfaceSolid}`}
+            className={`rounded-[1.5rem] md:rounded-[1.5rem] md:rounded-[2.5rem] p-4 md:p-8 border shadow-2xl relative w-full max-h-none ${surfaceSolid}`}
           >
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1/2 h-px bg-gradient-to-r from-transparent via-[#5C7C89]/50 to-transparent" />
 
@@ -1720,7 +1981,7 @@ export function App() {
                 muted={muted}
               />
 
-              <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4">
                 {certifications.map((cert: Certification, i: number) => {
                   const handleMouseMove = (
                     e: React.MouseEvent<HTMLDivElement>
@@ -1743,9 +2004,9 @@ export function App() {
                       onMouseMove={handleMouseMove}
                       style={{
                         transitionDelay: `${i * 10}ms`,
-                        minHeight: "280px",
+                        minHeight: isMobile ? "240px" : "280px",
                       }}
-                      className={`group premium-card relative flex flex-col rounded-[2.5rem] ${cardBg} p-4 md:p-5 transition-all duration-500 ease-out hover:-translate-y-4 hover:scale-[1.02] hover:shadow-2xl ${
+                      className={`group premium-card relative flex flex-col rounded-[1.5rem] md:rounded-[1.5rem] md:rounded-[2.5rem] ${cardBg} p-4 md:p-5 transition-all duration-500 ease-out hover:-translate-y-4 hover:scale-[1.02] hover:shadow-2xl ${
                         visible["certifications"]
                           ? "opacity-100 translate-y-0"
                           : "opacity-0 translate-y-10"
@@ -1760,9 +2021,11 @@ export function App() {
                         </span>
                         <div className="w-11 h-11 rounded-lg bg-white/10 p-1.5 flex items-center justify-center overflow-hidden shrink-0 shadow-inner">
                           <img
+                            loading="lazy"
+                            decoding="async"
                             src={cert.logo}
                             alt={cert.issuer}
-                            className="max-w-full max-h-full object-contain grayscale group-hover:grayscale-0 transition-all duration-500"
+                            className="max-w-full max-h-full transition-all duration-500"
                           />
                         </div>
                       </div>
@@ -1797,11 +2060,11 @@ export function App() {
       {/* ── Skills & Expertise (Updated & Unified) ───────────────────────── */}
       <section
         id="skills"
-        className="relative min-h-screen w-full pt-24 pb-12 px-4 flex items-start"
+        className="relative min-h-[auto] md:min-h-screen w-full pt-24 pb-12 px-4 flex items-start"
       >
         <div className={getSectionCardClasses("skills")}>
           <div
-            className={`rounded-[2.5rem] p-6 md:p-8 border shadow-2xl relative w-full max-h-none ${surfaceSolid}`}
+            className={`rounded-[1.5rem] md:rounded-[1.5rem] md:rounded-[2.5rem] p-4 md:p-8 border shadow-2xl relative w-full max-h-none ${surfaceSolid}`}
           >
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1/2 h-px bg-gradient-to-r from-transparent via-[#5C7C89]/50 to-transparent" />
 
@@ -1838,7 +2101,7 @@ export function App() {
                         transitionDelay: `${i * 10}ms`,
                         minHeight: "260px",
                       }}
-                      className={`group premium-card relative flex flex-col rounded-[2.5rem] border ${cardBg} p-6 md:p-6 transition-all duration-500 ease-out hover:-translate-y-4 hover:scale-[1.02] hover:border-[#5C7C89]/40 hover:shadow-2xl ${
+                      className={`group premium-card relative flex flex-col rounded-[1.5rem] md:rounded-[1.5rem] md:rounded-[2.5rem] border ${cardBg} p-6 md:p-6 transition-all duration-500 ease-out hover:-translate-y-4 hover:scale-[1.02] hover:border-[#5C7C89]/40 hover:shadow-2xl ${
                         visible["skills"]
                           ? "opacity-100 translate-y-0"
                           : "opacity-0 translate-y-10"
@@ -1894,11 +2157,11 @@ export function App() {
       {/* ── Education: Academic Foundation ─────────────────────────────── */}
       <section
         id="education"
-        className="relative min-h-screen w-full pt-24 pb-12 px-4 flex items-start"
+        className="relative min-h-[auto] md:min-h-screen w-full pt-24 pb-12 px-4 flex items-start"
       >
         <div className={getSectionCardClasses("education")}>
           <div
-            className={`rounded-[2.5rem] p-6 md:p-8 border shadow-2xl relative w-full max-h-none ${surfaceSolid}`}
+            className={`rounded-[1.5rem] md:rounded-[1.5rem] md:rounded-[2.5rem] p-4 md:p-8 border shadow-2xl relative w-full max-h-none ${surfaceSolid}`}
           >
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1/2 h-px bg-gradient-to-r from-transparent via-[#5C7C89]/50 to-transparent" />
 
@@ -1935,7 +2198,7 @@ export function App() {
                         transitionDelay: `${i * 10}ms`,
                         minHeight: "260px",
                       }}
-                      className={`group premium-card relative flex flex-col rounded-[2.5rem] border ${cardBg} p-6 md:p-6 transition-all duration-500 ease-out hover:-translate-y-4 hover:scale-[1.02] hover:border-[#5C7C89]/40 hover:shadow-2xl ${
+                      className={`group premium-card relative flex flex-col rounded-[1.5rem] md:rounded-[1.5rem] md:rounded-[2.5rem] border ${cardBg} p-6 md:p-6 transition-all duration-500 ease-out hover:-translate-y-4 hover:scale-[1.02] hover:border-[#5C7C89]/40 hover:shadow-2xl ${
                         visible["education"]
                           ? "opacity-100 translate-y-0"
                           : "opacity-0 translate-y-10"
@@ -1954,7 +2217,7 @@ export function App() {
                             dark
                               ? "bg-black/20 border-white/10"
                               : "bg-white border-slate-200"
-                          } transition-transform duration-300 group-hover:scale-110`}
+                          } transition-transform duration-300 md:group-hover:scale-110`}
                         >
                           <svg
                             width="18"
@@ -2029,11 +2292,11 @@ export function App() {
       {/* ── Connect: Active Signals ─────────────────────────────────────── */}
       <section
         id="contact"
-        className="relative min-h-screen w-full pt-24 pb-12 px-4 flex items-start"
+        className="relative min-h-[auto] md:min-h-screen w-full pt-24 pb-12 px-4 flex items-start"
       >
         <div className={getSectionCardClasses("contact")}>
           <div
-            className={`rounded-[2.5rem] p-6 md:p-8 border shadow-2xl relative w-full max-h-none ${surfaceSolid}`}
+            className={`rounded-[1.5rem] md:rounded-[1.5rem] md:rounded-[2.5rem] p-4 md:p-8 border shadow-2xl relative w-full max-h-none ${surfaceSolid}`}
           >
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1/2 h-px bg-gradient-to-r from-transparent via-[#5C7C89]/50 to-transparent" />
 
@@ -2092,7 +2355,7 @@ export function App() {
                       rel="noreferrer"
                       onMouseMove={handleMouseMove}
                       style={{ transitionDelay: `${i * 10}ms` }}
-                      className={`group premium-card relative flex flex-col rounded-[2.5rem] border ${cardBg} p-6 transition-all duration-500 ease-out hover:-translate-y-4 hover:scale-[1.02] hover:border-[#5C7C89]/40 hover:shadow-2xl ${
+                      className={`group premium-card relative flex flex-col rounded-[1.5rem] md:rounded-[1.5rem] md:rounded-[2.5rem] border ${cardBg} p-6 transition-all duration-500 ease-out hover:-translate-y-4 hover:scale-[1.02] hover:border-[#5C7C89]/40 hover:shadow-2xl ${
                         visible["contact"]
                           ? "opacity-100 translate-y-0"
                           : "opacity-0 translate-y-10"
@@ -2113,7 +2376,7 @@ export function App() {
                             dark
                               ? "bg-black/20 border-white/10"
                               : "bg-white border-slate-200"
-                          } transition-all duration-300 group-hover:scale-110 group-hover:border-[#5C7C89]/40`}
+                          } transition-all duration-300 md:group-hover:scale-110 group-hover:border-[#5C7C89]/40`}
                         >
                           {social.icon}
                         </div>
